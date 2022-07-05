@@ -21,7 +21,7 @@
 
         .btn-action {
             width: 120px;
-            height: 80px;
+            height: 60px;
             vertical-align: middle;
         }
 
@@ -90,17 +90,20 @@
                     <button class="btn btn-outline-success btn-general" onclick="NewGame()">لعبة جديدة
                     </button>
                 </div>
-                <table id="PlayersTable" class="table text-center table-dark">
+                <table id="PlayersTable" class="table text-center table-dark" style="display: table;">
                     <thead>
                         <tr>
-                            <th scope="col" colspan="2"> <input id="PlayerNameInput" type="text"
-                                    class="form-control text-right" placeholder="اسم لاعب" /></th>
+                            <th scope="col" colspan="2">
+                                <input id="PlayerNameInput" type="text" class="form-control text-right"
+                                    placeholder="اسم لاعب" />
+                            </th>
                             <th scope="col"><button class="btn btn-primary" onclick="AddPlayer()"
-                                    type="button">اضافة</button></th>
+                                    type="button">اضافة</button>
+                            </th>
                         </tr>
                         <tr>
                             <th scope="col">الترتيب</th>
-                            <th scope="col">اسم اللاعب</th>
+                            <th scope="col">الاسم</th>
                             <th scope="col">النقاط</th>
                         </tr>
                     </thead>
@@ -111,7 +114,11 @@
                         <tr>
                             <th>التاريخ</th>
                             <th>عدد اللاعبين</th>
-                            <th></th>
+                            <th class="d-flex justify-content-center">
+                                <button type="button" class="close text-white float-left" onclick="ToggleTables()">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="HistoryTbody">
@@ -133,7 +140,7 @@
                     <table id="PlayersTable" class="table text-center table-dark">
                         <thead>
                             <tr>
-                                <th scope="col">اسم اللاعب</th>
+                                <th scope="col">الاسم</th>
                                 <th scope="col">النقاط</th>
                                 <th scope="col"></th>
                             </tr>

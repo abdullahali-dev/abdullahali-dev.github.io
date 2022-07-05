@@ -173,7 +173,7 @@ function doAction(isAddPlayer = true) {
   for (let i = 0; i < window.Players.length; i++) {
     let playerID = window.Players[i].ID;
     let input = document.getElementById("input-box-" + playerID);
-    if (input.value.match("^[0-9]+$")) {
+    if (input.value.match("^-?[0-9]+$")) {
       window.Players[i].Score += parseInt(input.value);
     }
   }
@@ -222,8 +222,8 @@ function populateHistory() {
   }
   gameHistory = JSON.parse(gameHistory);
   for (let i = 0; i < gameHistory.length; i++) {
-    if(gameHistory[i].players.length < 1){
-        continue;
+    if (gameHistory[i].players.length < 1) {
+      continue;
     }
     let tr = document.createElement("tr");
     let tdDate = document.createElement("td");
@@ -235,14 +235,13 @@ function populateHistory() {
     tdDate.innerText = gameHistory[i].gameDate;
     tdPlayersCount.innerText = gameHistory[i].players.length;
     btnReuse.innerText = "استعادة";
-    btnReuse.addEventListener("click",function(e){
-        let history = JSON.parse(localStorage.getItem("gameHistory"));
-        let restoreGame = history.find((x)=>x.gameId == gameHistory[i].gameId );
-        NewGame(true,restoreGame.players);
-        document.getElementById("PlayersTable").style.display = "table";
-        document.getElementById("HistoryTable").style.display = "none";
+    btnReuse.addEventListener("click", function (e) {
+      let history = JSON.parse(localStorage.getItem("gameHistory"));
+      let restoreGame = history.find((x) => x.gameId == gameHistory[i].gameId);
+      NewGame(true, restoreGame.players);
+      ToggleTables();
     });
-    btnReuse.classList = ['btn btn-primary btn-sm'];
+    btnReuse.classList = ["btn btn-primary btn-sm"];
     tdReuse.appendChild(btnReuse);
 
     tr.appendChild(tdDate);
@@ -250,6 +249,12 @@ function populateHistory() {
     tr.appendChild(tdReuse);
     tbody.appendChild(tr);
   }
-  document.getElementById("PlayersTable").style.display = "none";
-  document.getElementById("HistoryTable").style.display = "table";
+  ToggleTables();
+}
+function ToggleTables() {
+  playersStatus = document.getElementById("PlayersTable");
+  historyStatus = document.getElementById("HistoryTable");
+
+  playersStatus.style.display = playersStatus.style.display == "table" ? "none" : "table";
+  historyStatus.style.display = historyStatus.style.display == "table" ? "none" : "table";
 }
