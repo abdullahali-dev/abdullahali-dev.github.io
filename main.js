@@ -80,7 +80,6 @@ function AddPlayer() {
 }
 
 function InitAction(actionType) {
-  window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
   if (localStorage.getItem("gameInfo") == null) {
     document.getElementById("NewGameBtn").focus();
     $("#NewGameBtn").popover("show");
@@ -89,6 +88,7 @@ function InitAction(actionType) {
     }, 3000);
     return;
   }
+  window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
   let multipleBy = 1;
   let isHandType = false;
   let arActionName = "";
