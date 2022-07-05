@@ -21,6 +21,14 @@
 
         .btn-action {
             width: 120px;
+            height: 80px;
+            vertical-align: middle;
+        }
+
+        .btn-general {
+            width: 160px;
+            height: 60px;
+            vertical-align: middle;
         }
 
         #PlayersInputTbody>tr>td {
@@ -30,10 +38,10 @@
         #PlayersInputTbody>tr>td>input {
             position: absolute;
             display: block;
-            top: 0;
+            top: 20%;
             left: 0;
             margin: 0;
-            margin-top: 15%;
+            /* margin-top: 15%; */
             height: 60%;
             width: 100%;
             border: none;
@@ -69,24 +77,51 @@
                         <button class="btn btn-primary btn-action m-1" onclick="InitAction('Finished')">خالص</button>
                     </div>
                 </div>
-                <hr>
-                <div class="input-group mb-3" dir="ltr">
+                <hr />
+                <!-- <div class="input-group mb-3" dir="ltr">
                     <div class="input-group-prepend">
-                        <button class="btn btn-primary" onclick="doAction()" type="button">اضافة</button>
+                        <button class="btn btn-primary" onclick="AddPlayer()" type="button">اضافة</button>
                     </div>
                     <input id="PlayerNameInput" type="text" class="form-control text-right" placeholder="اسم لاعب" />
+                </div> -->
+                <div class="col-12 d-flex justify-content-around my-3">
+                    <button class="btn btn-outline-info btn-general" onclick="populateHistory()">الالعاب
+                        السابقة</button>
+                    <button class="btn btn-outline-success btn-general" onclick="NewGame()">لعبة جديدة
+                    </button>
                 </div>
                 <table id="PlayersTable" class="table text-center table-dark">
                     <thead>
-                        <th scope="col">الترتيب</th>
-                        <th scope="col">اسم اللاعب</th>
-                        <th scope="col">النقاط</th>
+                        <tr>
+                            <th scope="col" colspan="2"> <input id="PlayerNameInput" type="text"
+                                    class="form-control text-right" placeholder="اسم لاعب" /></th>
+                            <th scope="col"><button class="btn btn-primary" onclick="AddPlayer()"
+                                    type="button">اضافة</button></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">الترتيب</th>
+                            <th scope="col">اسم اللاعب</th>
+                            <th scope="col">النقاط</th>
+                        </tr>
                     </thead>
                     <tbody id="PlayersTbody"></tbody>
+                </table>
+                <table id="HistoryTable" class="table table-dark text-center" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>عدد اللاعبين</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="HistoryTbody">
+
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="PlayersInputModal" tabindex="-1" role="dialog" aria-labelledby="PlayersInputModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -97,10 +132,11 @@
                 <div class="modal-body p-1" id="PlayersInputModal">
                     <table id="PlayersTable" class="table text-center table-dark">
                         <thead>
-                            <!-- <th scope="col">الترتيب</th> -->
-                            <th scope="col">اسم اللاعب</th>
-                            <th scope="col">النقاط</th>
-                            <th scope="col"></th>
+                            <tr>
+                                <th scope="col">اسم اللاعب</th>
+                                <th scope="col">النقاط</th>
+                                <th scope="col"></th>
+                            </tr>
                         </thead>
                         <tbody id="PlayersInputTbody"></tbody>
                     </table>
@@ -123,180 +159,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-    <script>
-
-        function Init() {
-            window.Players = [];
-        }
-        function AddPlayer() {
-            let id = window.Players.length + 1;
-            let name = document.getElementById("PlayerNameInput");
-            window.Players.push({
-                ID: id,
-                Name: name.value,
-                Score: 0,
-            });
-
-            let tbody = document.getElementById("PlayersTbody");
-            let tr = document.createElement("tr");
-            let tdSort = document.createElement("td");
-            let tdName = document.createElement("td");
-            let tdScore = document.createElement("td");
-            tdScore.classList.add("text-center");
-            let tdActions = document.createElement("td");
-
-            tr.id = id;
-            tdName.innerText = name.value;
-            tdScore.innerText = 0;
-            tdSort.innerText = id;
-            tdSort.style.textAlign = "center";
-            tr.appendChild(tdSort);
-            tr.appendChild(tdName);
-            tr.appendChild(tdScore);
-            tr.appendChild(tdActions);
-            tbody.appendChild(tr);
-            name.value = "";
-        }
-
-        function InitAction(actionType) {
-            let multipleBy = 1;
-            let isHandType = false;
-            let arActionName = '';
-            switch (actionType) {
-                case "Hand":
-                    multipleBy = 1;
-                    isHandType = true;
-                    arActionName = 'هند';
-                    break;
-                case "SuperHand":
-                    multipleBy = 2
-                    isHandType = true;
-                    arActionName = 'سوبر هند';
-                    break;
-                case "FullHand":
-                    multipleBy = 3;
-                    isHandType = true;
-                    arActionName = 'فل هند';
-                    break;
-                case "Finished":
-                    multipleBy = 1;
-                    isHandType = false;
-                    arActionName = 'خالص';
-                    break;
-            }
-            let loserNum = isHandType == true ? 200 : 100;
-            let winnerNum = isHandType == true ? -60 : -30;
-            let actionScore = loserNum * multipleBy;
-
-            let tbody = document.getElementById("PlayersInputTbody");
-            tbody.innerHTML = "";
-            for (let i = 0; i < window.Players.length; i++) {
-
-                //tr
-                let tr = document.createElement("tr");
-                tr.id = 'input-tr-' + window.Players[i].ID;
-
-                //Name
-                let tdName = document.createElement("td");
-                tdName.innerText = window.Players[i].Name;
-                tr.appendChild(tdName);
-
-                //Score
-                let tdScore = document.createElement("td");
-                tdScore.classList.add("text-center");
-                inputScore = document.createElement("input");
-                let inputId = "input-box-" + window.Players[i].ID;
-                inputScore.id = inputId;
-                inputScore.value = actionScore;
-                inputScore.type = "tel";
-                inputScore.addEventListener("click", function (e) {
-                    e.target.value = "";
-                });
-                tdScore.appendChild(inputScore);
-                tr.appendChild(tdScore);
-
-                let tdActions = document.createElement("td");
-
-                //Plus Btn
-                if (isHandType) {
-                    let plus50 = document.createElement("button");
-                    plus50.addEventListener("click", function (e) {
-                        document.getElementById(inputId).value = (50 * multipleBy) + actionScore;
-                        let plusBtns = document.getElementsByClassName("plus-btn");
-                        for(let i=0;i<plusBtns.length; i++){
-                            plusBtns[i].disabled = true;
-                            plusBtns[i].classList = ['btn btn-secondary mx-1 plus-btn'];
-                        }
-                    });
-                    plus50.classList = ['btn btn-primary mx-1 plus-btn'];
-                    plus50.innerText = "+" + (50 * multipleBy);
-                    tdActions.appendChild(plus50);
-                }
-
-                // Action Btn
-                let actionBtn = document.createElement("button");
-                actionBtn.addEventListener("click", function (e) {
-                    document.getElementById(inputId).value = winnerNum * multipleBy;
-                    let actionBtns = document.getElementsByClassName("action-btn");
-                        for(let i=0;i<actionBtns.length; i++){
-                            actionBtns[i].disabled = true;
-                            actionBtns[i].classList = ['btn btn-secondary action-btn'];
-                        }
-                });
-                actionBtn.classList = ['btn btn-success action-btn'];
-                actionBtn.innerText = arActionName;
-                tdActions.appendChild(actionBtn);
-                tdActions.classList.add("text-center");
-                tr.appendChild(tdActions);
-                tbody.appendChild(tr);
-
-            }
-            $('#PlayersInputModal').modal('toggle')
-        }
-
-        function doAction(isAddPlayer = true) {
-            let tbody = document.getElementById("PlayersTbody");
-            if (isAddPlayer) {
-                let id = window.Players.length + 1;
-                let name = document.getElementById("PlayerNameInput");
-                window.Players.push({
-                    ID: id,
-                    Name: name.value,
-                    Score: 0,
-                });
-                name.value = "";
-            }
-            tbody.innerHTML = "";
-            for (let i = 0; i < window.Players.length; i++) {
-                let playerID = window.Players[i].ID;
-                if (!isAddPlayer) {
-                    let input = document.getElementById("input-box-" + playerID);
-                    window.Players[i].Score += parseInt(input.value);
-                }
-                let tr = document.createElement("tr");
-                let tdSort = document.createElement("td");
-                let tdName = document.createElement("td");
-                let tdScore = document.createElement("td");
-                tr.id = playerID;
-
-                tdSort.innerText = playerID;
-                tdSort.style.textAlign = "center";
-
-                tdName.innerText = window.Players[i].Name;
-
-                tdScore.innerText = window.Players[i].Score;
-                tdScore.style.textAlign = "center";
-
-                tr.appendChild(tdSort);
-                tr.appendChild(tdName);
-                tr.appendChild(tdScore);
-                tbody.appendChild(tr);
-            }
-            if (!isAddPlayer) {
-                $('#PlayersInputModal').modal('toggle');
-            }
-        }
-    </script>
+    <script src="./main.js"></script>
 </body>
 
 </html>
