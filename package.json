@@ -1,0 +1,22 @@
+{
+  "name": "kenkan",
+  "version": "1.0.0",
+  "description": "Kenkan App",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdullahali-dev/abdullahali-dev.github.io.git"
+  },
+  "author": "Abdullah Ali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdullahali-dev/abdullahali-dev.github.io/issues"
+  },
+  "homepage": "https://github.com/abdullahali-dev/abdullahali-dev.github.io#readme",
+  "dependencies": {
+    "serve": "^13.0.2"
+  }
+}
