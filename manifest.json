@@ -1,6 +1,6 @@
 {
-  "name": "My First Progressive Web app",
-  "short_name": "First PWA",
+  "name": "نشرة كنكان",
+  "short_name": "نشرة كنكان",
   "icons": [
     {
       "src": "./icons/180.png",
@@ -13,9 +13,9 @@
       "type": "image/png"
     }
   ],
-  "lang": "en-US",
+  "lang": "ar-SA",
   "start_url": "/index.html",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "white",
   "theme_color": "white"
 }
