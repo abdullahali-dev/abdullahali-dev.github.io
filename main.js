@@ -74,12 +74,14 @@ function AddPlayer() {
   } else {
     name.style.borderColor = "#ced4da";
   }
+  localStorage.setItem("gameInfoBackup", localStorage.getItem("gameInfo"));
   window.gameInfo.players.push({
     ID: Date.now(),
     Name: name.value,
     Score: 0,
   });
   name.value = "";
+  UpdateCurrentGame();
   PopulatePlayersTable();
 }
 
@@ -156,7 +158,12 @@ function InitAction(actionType) {
       let plus50 = document.createElement("button");
       plus50.id = plus50Id;
       plus50.addEventListener("click", function (e) {
-        document.getElementById(inputId).value = 50 * multipleBy + actionScore;
+        input = document.getElementById(inputId);
+        let currentVal = 0;
+        if (input.value.match("^-?[0-9]+$")) {
+          currentVal = parseInt(input.value);
+        }
+        document.getElementById(inputId).value = currentVal + 50 * multipleBy;
         let plusBtns = document.getElementsByClassName("plus-btn");
         for (let i = 0; i < plusBtns.length; i++) {
           plusBtns[i].disabled = true;
@@ -282,4 +289,26 @@ function PopulatePlayersTable() {
   }
 
   UpdateCurrentGame();
+  PopulateLosersTable();
+}
+
+function PopulateLosersTable() {
+  let playersList = window.gameInfo.players.filter((player) => player.Score >= window.gameInfo.maxScore);
+  if (playersList.length > 0) {
+    let tbody = document.getElementById("LosersTbody");
+    tbody.innerHTML = "";
+    for (let i = 0; i < playersList.length; i++) {
+      let tr = document.createElement("tr");
+      let tdName = document.createElement("td");
+      tdName.innerText = playersList[i].Name;
+      let tdScore = document.createElement("td");
+      tdScore.innerText = playersList[i].Score;
+      tr.appendChild(tdName);
+      tr.appendChild(tdScore);
+      tbody.appendChild(tr);
+    }
+    document.getElementById("LosersTable").style.display = "table";
+  }else{
+    document.getElementById("LosersTable").style.display = "none";
+  }
 }
