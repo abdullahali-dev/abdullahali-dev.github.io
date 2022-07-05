@@ -71,6 +71,11 @@
             vertical-align: middle;
             width: 40px;
         }
+        td,th{
+            padding-left: 1px !important;
+            padding-right: 1px !important;
+            margin: 0;
+        }
     </style>
     <title>نشرة كنكان</title>
 </head>
@@ -103,12 +108,12 @@
                 <table id="PlayersTable" class="table text-center table-dark">
                     <thead>
                         <tr>
-                            <th scope="col" colspan="3">
+                            <th scope="col" colspan="3" class="px-2">
                                 <input id="PlayerNameInput" type="text" class="form-control text-right"
-                                    placeholder="اسم لاعب" />
+                                    placeholder="اسم لاعب"  maxlength="10"/>
                             </th>
                             <th scope="col">
-                                <button class="btn btn-primary" onclick="AddPlayer()" type="button">اضافة</button>
+                                <button class="btn btn-primary " onclick="AddPlayer()" type="button">اضافة</button>
                             </th>
                         </tr>
                         <tr>

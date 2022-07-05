@@ -61,7 +61,6 @@ function UpdateCurrentGame() {
 }
 
 function AddPlayer() {
-  let id = window.gameInfo.players.length + 1;
   let name = document.getElementById("PlayerNameInput");
   if (name.value == "") {
     name.style.borderColor = "red";
@@ -89,6 +88,7 @@ function InitAction(actionType) {
     return;
   }
   window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
+  let playersList = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
   let multipleBy = 1;
   let isHandType = false;
   let arActionName = "";
@@ -101,12 +101,12 @@ function InitAction(actionType) {
     case "SuperHand":
       multipleBy = 2;
       isHandType = true;
-      arActionName = "سوبر هند";
+      arActionName = "سوبر";
       break;
     case "FullHand":
       multipleBy = 3;
       isHandType = true;
-      arActionName = "فل هند";
+      arActionName = "فلل ";
       break;
     case "Finished":
       multipleBy = 1;
@@ -120,20 +120,20 @@ function InitAction(actionType) {
 
   let tbody = document.getElementById("PlayersInputTbody");
   tbody.innerHTML = "";
-  for (let i = 0; i < window.gameInfo.players.length; i++) {
+  for (let i = 0; i < playersList.length; i++) {
     //tr
     let tr = document.createElement("tr");
-    tr.id = "input-tr-" + window.gameInfo.players[i].ID;
+    tr.id = "input-tr-" + playersList[i].ID;
 
     //Name
     let tdName = document.createElement("td");
-    tdName.innerText = window.gameInfo.players[i].Name;
+    tdName.innerText = playersList[i].Name;
     tr.appendChild(tdName);
 
     //Score
     let tdScore = document.createElement("td");
     inputScore = document.createElement("input");
-    let inputId = "input-box-" + window.gameInfo.players[i].ID;
+    let inputId = "input-box-" + playersList[i].ID;
     inputScore.id = inputId;
     inputScore.value = actionScore;
     inputScore.type = "tel";
@@ -146,7 +146,7 @@ function InitAction(actionType) {
     let tdActions = document.createElement("td");
 
     //Plus Btn
-    let plus50Id = "plus-btn-" + window.gameInfo.players[i].ID;
+    let plus50Id = "plus-btn-" + playersList[i].ID;
     if (isHandType) {
       let plus50 = document.createElement("button");
       plus50.id = plus50Id;
@@ -155,7 +155,8 @@ function InitAction(actionType) {
         let plusBtns = document.getElementsByClassName("plus-btn");
         for (let i = 0; i < plusBtns.length; i++) {
           plusBtns[i].disabled = true;
-          plusBtns[i].classList = ["btn btn-secondary mx-1 plus-btn"];
+          plusBtns[i].classList.remove("btn-primary");
+          plusBtns[i].classList.add("btn-secondary");
         }
       });
       plus50.classList = ["btn btn-primary mx-1 plus-btn"];
@@ -174,7 +175,8 @@ function InitAction(actionType) {
       let actionBtns = document.getElementsByClassName("action-btn");
       for (let i = 0; i < actionBtns.length; i++) {
         actionBtns[i].disabled = true;
-        actionBtns[i].classList = ["btn btn-secondary action-btn"];
+        actionBtns[i].classList.remove("btn-success");
+        actionBtns[i].classList.add("btn-secondary");
       }
     });
     actionBtn.classList = ["btn btn-success action-btn"];
@@ -190,14 +192,15 @@ function DoAction() {
   let gameInfo = localStorage.getItem("gameInfo");
   gameInfo = JSON.parse(gameInfo);
   localStorage.setItem("gameInfoBackup", JSON.stringify(gameInfo));
-  for (let i = 0; i < window.gameInfo.players.length; i++) {
-    let playerID = window.gameInfo.players[i].ID;
+  let playersList = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
+  for (let i = 0; i < playersList.length; i++) {
+    let playerID = playersList[i].ID;
     let input = document.getElementById("input-box-" + playerID);
-    if (input.value.match("^-?[0-9]+$")) {
+    if (input != null && input.value.match("^-?[0-9]+$")) {
       window.gameInfo.players[i].Score += parseInt(input.value);
     }
   }
-  window.gameInfo.players = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
+  //   window.gameInfo.players = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
   UpdateCurrentGame();
   PopulatePlayersTable();
 
@@ -215,30 +218,32 @@ function Undo() {
 
 function PopulatePlayersTable() {
   window.gameInfo.players = window.gameInfo.players.sort((x, y) => Number(x.Score) - Number(y.Score));
+  let playersList = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
   let tbody = document.getElementById("PlayersTbody");
   tbody.innerHTML = "";
-  for (let i = 0; i < window.gameInfo.players.length; i++) {
-    let playerID = window.gameInfo.players[i].ID;
+  for (let i = 0; i < playersList.length; i++) {
+    let playerID = playersList[i].ID;
 
     let tr = document.createElement("tr");
     tr.id = playerID;
 
     let tdSort = document.createElement("td");
     tdSort.innerText = i + 1;
-    tdSort.style.width = "10px";
 
     let tdName = document.createElement("td");
-    tdName.innerText = window.gameInfo.players[i].Name;
+    tdName.innerText = playersList[i].Name;
 
     let tdScore = document.createElement("td");
-    tdScore.innerText = window.gameInfo.players[i].Score;
+    tdScore.innerText = playersList[i].Score;
 
     let btnDel = document.createElement("button");
     btnDel.innerText = "X";
     btnDel.classList = ["btn-colse text-danger float-left d-inline"];
+    btnDel.style.marginLeft = "2px";
     btnDel.dataset.id = playerID;
     btnDel.addEventListener("click", function (e) {
       if (confirm("هل انت متأكد ؟")) {
+        localStorage.setItem("gameInfoBackup", localStorage.getItem("gameInfo"));
         window.gameInfo.players = window.gameInfo.players.filter((player) => player.ID != e.currentTarget.dataset.id);
         UpdateCurrentGame();
         PopulatePlayersTable();
@@ -247,15 +252,15 @@ function PopulatePlayersTable() {
 
     let tdDel = document.createElement("td");
     tdDel.appendChild(btnDel);
-    if (window.gameInfo.players.length > 1 && window.gameInfo.players.filter((x) => x.Score != 0).length > 0) {
-      if (i == window.gameInfo.players.length - 2) {
+    if (playersList.length > 1 && playersList.filter((x) => x.Score != 0).length > 0) {
+      if (i == playersList.length - 2) {
         let span = document.createElement("span");
         span.classList = ["badge badge-warning float-right"];
         span.style.verticalAlign = "middle";
         span.innerText = "يجرش";
         tdDel.appendChild(span);
       }
-      if (i == window.gameInfo.players.length - 1) {
+      if (i == playersList.length - 1) {
         let span = document.createElement("span");
         span.classList = ["badge badge-warning float-right"];
         span.style.verticalAlign = "middle";
