@@ -1,59 +1,67 @@
 function Init() {
-  let gameInfo = {};
-  let gameHistory = localStorage.getItem("gameHistory");
-  if (gameHistory == null) {
-    NewGame(false);
+  $("#NewGameBtn").popover({
+    content: "اضغط هنا للبدء",
+    trigger: "manual",
+  });
+
+  let gameInfo = localStorage.getItem("gameInfo");
+  if (gameInfo != null) {
+    gameInfo = JSON.parse(gameInfo);
+    window.gameInfo = gameInfo;
+    PopulatePlayersTable();
   } else {
-    gameHistory = JSON.parse(gameHistory);
-    gameHistory = gameHistory.sort((x, y) => y.gameDate - x.gameDate);
-    gameInfo = gameHistory[0];
-    window.Players = gameInfo.players;
+    document.getElementById("PlayersTable").style.display = "none";
+    document.getElementById("NewGameBtn").focus();
+    $("#NewGameBtn").popover("show");
+    setTimeout(function () {
+      $("#NewGameBtn").popover("hide");
+    }, 3000);
   }
-  populatePlayersTable();
 }
 
-function NewGame(askConfirm = true, players = []) {
-  if (askConfirm) {
+function NewGame(askConfirm = true) {
+  if (askConfirm && window.gameInfo != undefined) {
     let confirm = window.confirm("هل انت متأكد !");
     if (!confirm) {
       return;
     }
   }
-  let gameHistory = localStorage.getItem("gameHistory");
-  if (gameHistory != null) {
-    gameHistory = JSON.parse(gameHistory);
-  } else {
-    gameHistory = [];
+  let maxScore = window.prompt("الحد الأعلى للنقاط");
+  if (maxScore == null || !maxScore.match("^[0-9]+$")) {
+    alert("يجب ادخال رقم صحيح");
+    return;
   }
-  validGamesHistory = [];
-  for (let i = 0; i < gameHistory.length; i++) {
-    if (gameHistory[i].players.length > 0) {
-      validGamesHistory.push(gameHistory[i]);
-    }
+  let gameInfo = localStorage.getItem("gameInfo");
+  let players = [];
+  if (gameInfo != null) {
+    gameInfo = JSON.parse(gameInfo);
+    players = gameInfo.players;
+    players.forEach((player) => {
+      player.Score = 0;
+    });
   }
-  gameHistory = validGamesHistory;
   let currentDate = new Date();
   gameInfo = {
     gameId: Date.now(),
     gameDate: currentDate.toISOString().split("T")[0],
+    maxScore: parseInt(maxScore),
     players: players,
   };
-  gameHistory.push(gameInfo);
-  localStorage.setItem("gameHistory", JSON.stringify(gameHistory));
-  window.Players = gameInfo.players;
-  populatePlayersTable();
+  localStorage.setItem("gameInfo", JSON.stringify(gameInfo));
+  window.gameInfo = gameInfo;
+  PopulatePlayersTable();
+  document.getElementById("PlayersTable").style.display = "table";
 }
 
 function UpdateCurrentGame() {
-  let gameHistory = localStorage.getItem("gameHistory");
-  gameHistory = JSON.parse(gameHistory);
-  gameHistory = gameHistory.sort((x, y) => y.gameDate - x.gameDate);
-  gameHistory[0].players = window.Players;
-  localStorage.setItem("gameHistory", JSON.stringify(gameHistory));
+  let gameInfo = localStorage.getItem("gameInfo");
+  gameInfo = JSON.parse(gameInfo);
+  gameInfo.players = window.gameInfo.players;
+  localStorage.setItem("gameInfo", JSON.stringify(gameInfo));
 }
 
 function AddPlayer() {
-  let id = window.Players.length + 1;
+  let id = window.gameInfo.players.length + 1;
   let name = document.getElementById("PlayerNameInput");
   if (name.value == "") {
     name.style.borderColor = "red";
@@ -62,16 +70,25 @@ function AddPlayer() {
   } else {
     name.style.borderColor = "#ced4da";
   }
-  window.Players.push({
-    ID: id,
+  window.gameInfo.players.push({
+    ID: Date.now(),
     Name: name.value,
     Score: 0,
   });
   name.value = "";
-  populatePlayersTable();
+  PopulatePlayersTable();
 }
 
 function InitAction(actionType) {
+  window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
+  if (localStorage.getItem("gameInfo") == null) {
+    document.getElementById("NewGameBtn").focus();
+    $("#NewGameBtn").popover("show");
+    setTimeout(function () {
+      $("#NewGameBtn").popover("hide");
+    }, 3000);
+    return;
+  }
   let multipleBy = 1;
   let isHandType = false;
   let arActionName = "";
@@ -103,20 +120,20 @@ function InitAction(actionType) {
 
   let tbody = document.getElementById("PlayersInputTbody");
   tbody.innerHTML = "";
-  for (let i = 0; i < window.Players.length; i++) {
+  for (let i = 0; i < window.gameInfo.players.length; i++) {
     //tr
     let tr = document.createElement("tr");
-    tr.id = "input-tr-" + window.Players[i].ID;
+    tr.id = "input-tr-" + window.gameInfo.players[i].ID;
 
     //Name
     let tdName = document.createElement("td");
-    tdName.innerText = window.Players[i].Name;
+    tdName.innerText = window.gameInfo.players[i].Name;
     tr.appendChild(tdName);
 
     //Score
     let tdScore = document.createElement("td");
     inputScore = document.createElement("input");
-    let inputId = "input-box-" + window.Players[i].ID;
+    let inputId = "input-box-" + window.gameInfo.players[i].ID;
     inputScore.id = inputId;
     inputScore.value = actionScore;
     inputScore.type = "tel";
@@ -129,7 +146,7 @@ function InitAction(actionType) {
     let tdActions = document.createElement("td");
 
     //Plus Btn
-    let plus50Id = "plus-btn-" + window.Players[i].ID;
+    let plus50Id = "plus-btn-" + window.gameInfo.players[i].ID;
     if (isHandType) {
       let plus50 = document.createElement("button");
       plus50.id = plus50Id;
@@ -169,92 +186,90 @@ function InitAction(actionType) {
   $("#PlayersInputModal").modal("toggle");
 }
 
-function doAction(isAddPlayer = true) {
-  for (let i = 0; i < window.Players.length; i++) {
-    let playerID = window.Players[i].ID;
+function DoAction() {
+  let gameInfo = localStorage.getItem("gameInfo");
+  gameInfo = JSON.parse(gameInfo);
+  localStorage.setItem("gameInfoBackup", JSON.stringify(gameInfo));
+  for (let i = 0; i < window.gameInfo.players.length; i++) {
+    let playerID = window.gameInfo.players[i].ID;
     let input = document.getElementById("input-box-" + playerID);
     if (input.value.match("^-?[0-9]+$")) {
-      window.Players[i].Score += parseInt(input.value);
+      window.gameInfo.players[i].Score += parseInt(input.value);
     }
   }
-  populatePlayersTable();
+  window.gameInfo.players = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
+  UpdateCurrentGame();
+  PopulatePlayersTable();
 
-  if (!isAddPlayer) {
-    $("#PlayersInputModal").modal("toggle");
+  $("#PlayersInputModal").modal("toggle");
+}
+function Undo() {
+  let gameBackup = localStorage.getItem("gameInfoBackup");
+  if (gameBackup != null) {
+    gameBackup = JSON.parse(gameBackup);
+    window.gameInfo.players = gameBackup.players;
+    UpdateCurrentGame();
+    PopulatePlayersTable();
   }
 }
 
-function populatePlayersTable() {
-  window.Players = window.Players.sort((x, y) => Number(y.Score) - Number(x.Score));
+function PopulatePlayersTable() {
+  window.gameInfo.players = window.gameInfo.players.sort((x, y) => Number(x.Score) - Number(y.Score));
   let tbody = document.getElementById("PlayersTbody");
   tbody.innerHTML = "";
-  for (let i = 0; i < window.Players.length; i++) {
-    let playerID = window.Players[i].ID;
-    let tr = document.createElement("tr");
-    let tdSort = document.createElement("td");
-    let tdName = document.createElement("td");
-    let tdScore = document.createElement("td");
+  for (let i = 0; i < window.gameInfo.players.length; i++) {
+    let playerID = window.gameInfo.players[i].ID;
 
+    let tr = document.createElement("tr");
     tr.id = playerID;
 
+    let tdSort = document.createElement("td");
     tdSort.innerText = i + 1;
-    tdSort.style.textAlign = "center";
+    tdSort.style.width = "10px";
 
-    tdName.innerText = window.Players[i].Name;
+    let tdName = document.createElement("td");
+    tdName.innerText = window.gameInfo.players[i].Name;
 
-    tdScore.innerText = window.Players[i].Score;
-    tdScore.style.textAlign = "center";
+    let tdScore = document.createElement("td");
+    tdScore.innerText = window.gameInfo.players[i].Score;
+
+    let btnDel = document.createElement("button");
+    btnDel.innerText = "X";
+    btnDel.classList = ["btn-colse text-danger float-left d-inline"];
+    btnDel.dataset.id = playerID;
+    btnDel.addEventListener("click", function (e) {
+      if (confirm("هل انت متأكد ؟")) {
+        window.gameInfo.players = window.gameInfo.players.filter((player) => player.ID != e.currentTarget.dataset.id);
+        UpdateCurrentGame();
+        PopulatePlayersTable();
+      }
+    });
+
+    let tdDel = document.createElement("td");
+    tdDel.appendChild(btnDel);
+    if (window.gameInfo.players.length > 1 && window.gameInfo.players.filter((x) => x.Score != 0).length > 0) {
+      if (i == window.gameInfo.players.length - 2) {
+        let span = document.createElement("span");
+        span.classList = ["badge badge-warning float-right"];
+        span.style.verticalAlign = "middle";
+        span.innerText = "يجرش";
+        tdDel.appendChild(span);
+      }
+      if (i == window.gameInfo.players.length - 1) {
+        let span = document.createElement("span");
+        span.classList = ["badge badge-warning float-right"];
+        span.style.verticalAlign = "middle";
+        span.innerText = "يوزع";
+        tdDel.appendChild(span);
+      }
+    }
 
     tr.appendChild(tdSort);
     tr.appendChild(tdName);
     tr.appendChild(tdScore);
+    tr.appendChild(tdDel);
     tbody.appendChild(tr);
   }
+
   UpdateCurrentGame();
-}
-function populateHistory() {
-  let tbody = document.getElementById("HistoryTbody");
-  tbody.innerHTML = "";
-  let gameHistory = localStorage.getItem("gameHistory");
-  if (gameHistory == null) {
-    alert("لا يوجد العاب سابقة");
-    return;
-  }
-  gameHistory = JSON.parse(gameHistory);
-  for (let i = 0; i < gameHistory.length; i++) {
-    if (gameHistory[i].players.length < 1) {
-      continue;
-    }
-    let tr = document.createElement("tr");
-    let tdDate = document.createElement("td");
-    let tdPlayersCount = document.createElement("td");
-    let tdReuse = document.createElement("td");
-    let btnReuse = document.createElement("button");
-
-    tr.id = gameHistory[i].gameId;
-    tdDate.innerText = gameHistory[i].gameDate;
-    tdPlayersCount.innerText = gameHistory[i].players.length;
-    btnReuse.innerText = "استعادة";
-    btnReuse.addEventListener("click", function (e) {
-      let history = JSON.parse(localStorage.getItem("gameHistory"));
-      let restoreGame = history.find((x) => x.gameId == gameHistory[i].gameId);
-      NewGame(true, restoreGame.players);
-      ToggleTables();
-    });
-    btnReuse.classList = ["btn btn-primary btn-sm"];
-    tdReuse.appendChild(btnReuse);
-
-    tr.appendChild(tdDate);
-    tr.appendChild(tdPlayersCount);
-    tr.appendChild(tdReuse);
-    tbody.appendChild(tr);
-  }
-  ToggleTables();
-}
-function ToggleTables() {
-  playersStatus = document.getElementById("PlayersTable");
-  historyStatus = document.getElementById("HistoryTable");
-
-  playersStatus.style.display = playersStatus.style.display == "table" ? "none" : "table";
-  historyStatus.style.display = historyStatus.style.display == "table" ? "none" : "table";
 }

@@ -25,9 +25,9 @@
             vertical-align: middle;
         }
 
-        .btn-general {
-            width: 160px;
-            height: 60px;
+        .btn-new-game {
+            width: 100px;
+            height: 40px;
             vertical-align: middle;
         }
 
@@ -55,6 +55,22 @@
         #PlayersInputTbody>tr>td {
             vertical-align: middle;
         }
+
+        .popover,
+        .popover-body {
+            background-color: white;
+        }
+
+        .btn-colse {
+            color: white;
+            border: none;
+            background: none;
+        }
+
+        .badge {
+            vertical-align: middle;
+            width: 40px;
+        }
     </style>
     <title>نشرة كنكان</title>
 </head>
@@ -64,7 +80,9 @@
         <div class="card bg-dark text-white border-white">
             <div class="card-header border-white">
                 <div class="card-title">
-                    <h3>نشرة كنكان</h3>
+                    <h4 class="d-inline">نشرة كنكان</h4>
+                    <button id="NewGameBtn" class="btn btn-info btn-new-game float-left d-inline"
+                        onclick="NewGame()">لعبة جديدة</button>
                 </div>
             </div>
             <div class="card-body p-2" dir="rtl">
@@ -76,54 +94,31 @@
                         <button class="btn btn-danger btn-action m-1" onclick="InitAction('FullHand')">فل هند</button>
                         <button class="btn btn-primary btn-action m-1" onclick="InitAction('Finished')">خالص</button>
                     </div>
-                </div>
-                <hr />
-                <!-- <div class="input-group mb-3" dir="ltr">
-                    <div class="input-group-prepend">
-                        <button class="btn btn-primary" onclick="AddPlayer()" type="button">اضافة</button>
+                    <div class="col-12 text-center">
+                        <button id="BtnUndo" class="btn btn-outline-success" style="width: 240px; margin: 4px;" onclick="Undo()"
+                            type="button">تراجع</button>
                     </div>
-                    <input id="PlayerNameInput" type="text" class="form-control text-right" placeholder="اسم لاعب" />
-                </div> -->
-                <div class="col-12 d-flex justify-content-around my-3">
-                    <button class="btn btn-outline-info btn-general" onclick="populateHistory()">الالعاب
-                        السابقة</button>
-                    <button class="btn btn-outline-success btn-general" onclick="NewGame()">لعبة جديدة
-                    </button>
+
                 </div>
-                <table id="PlayersTable" class="table text-center table-dark" style="display: table;">
+                <table id="PlayersTable" class="table text-center table-dark">
                     <thead>
                         <tr>
-                            <th scope="col" colspan="2">
+                            <th scope="col" colspan="3">
                                 <input id="PlayerNameInput" type="text" class="form-control text-right"
                                     placeholder="اسم لاعب" />
                             </th>
-                            <th scope="col"><button class="btn btn-primary" onclick="AddPlayer()"
-                                    type="button">اضافة</button>
+                            <th scope="col">
+                                <button class="btn btn-primary" onclick="AddPlayer()" type="button">اضافة</button>
                             </th>
                         </tr>
                         <tr>
                             <th scope="col">الترتيب</th>
                             <th scope="col">الاسم</th>
                             <th scope="col">النقاط</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody id="PlayersTbody"></tbody>
-                </table>
-                <table id="HistoryTable" class="table table-dark text-center" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>عدد اللاعبين</th>
-                            <th class="d-flex justify-content-center">
-                                <button type="button" class="close text-white float-left" onclick="ToggleTables()">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="HistoryTbody">
-
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -137,7 +132,7 @@
                     <h4 class="modal-title" id="PlayersInputModalLabel">تسجيل</h4>
                 </div>
                 <div class="modal-body p-1" id="PlayersInputModal">
-                    <table id="PlayersTable" class="table text-center table-dark">
+                    <table id="PlayersInputTable" class="table text-center table-dark">
                         <thead>
                             <tr>
                                 <th scope="col">الاسم</th>
@@ -151,8 +146,7 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-secondary" style="width: 100px;"
                         data-dismiss="modal">الغاء</button>
-                    <button type="button" class="btn btn-primary" style="width: 100px;"
-                        onclick="doAction(false)">تم</button>
+                    <button type="button" class="btn btn-primary" style="width: 100px;" onclick="DoAction()">تم</button>
                 </div>
             </div>
         </div>
