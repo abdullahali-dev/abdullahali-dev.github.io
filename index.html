@@ -82,11 +82,22 @@
             padding-right: 1px !important;
             margin: 0;
         }
+
+        .my-footer {
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            width: 100%;
+            top: 95%;
+            text-align: center;
+            background-color: inherit;
+            color: white;
+        }
     </style>
     <title>نشرة كنكان</title>
 </head>
 
-<body class="text-right pt-3 bg-dark" onload="Init()">
+<body class="text-right pt-3 bg-dark d-flex flex-column min-vh-100" onload="Init()">
     <div id="MainContainer" class="container p-1">
         <div class="card bg-dark text-white border-white">
             <div class="card-header border-white">
@@ -145,7 +156,7 @@
                         </tr>
                     </thead>
                     <tbody id="LosersTbody">
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -189,6 +200,10 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="./main.js"></script>
+    <div class="my-footer">
+
+        Create by <a href="mailto:abdullah.dev3@gmail.com.com">Abdullah Ali</a> © 2022
+    </div>
 </body>
 
 </html>

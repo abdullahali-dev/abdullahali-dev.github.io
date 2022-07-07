@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/abdullahali-dev/abdullahali-dev.github.io/issues"
   },
-  "homepage": "https://github.com/abdullahali-dev/abdullahali-dev.github.io#readme",
-  "dependencies": {
-    "serve": "^13.0.2"
-  }
+  "homepage": "https://github.com/abdullahali-dev/abdullahali-dev.github.io#readme"
 }
