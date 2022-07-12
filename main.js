@@ -4,6 +4,47 @@ function Init() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
   }
+
+  // let title = document.getElementById("title");
+  // window.isTitleHold = false;
+  // window.titleHoldTimeoutId = null;
+  // ["mousedown", "touchstart"].forEach((eventType) => {
+  //   title.addEventListener(eventType, function (e) {
+  //     e.preventDefault();
+  //     window.isTitleHold = true;
+  //     window.titleHoldTimeoutId = setTimeout(() => {
+  //       if (window.isTitleHold) {
+  //         $("#overlayImage").modal("toggle");
+  //       }
+  //     }, 1000);
+  //   });
+  // });
+
+  // ["mouseup", "mouseleave", "mouseout", "touchend", "touchcancel"].forEach((eventType) => {
+  //   title.addEventListener(eventType, function () {
+  //     window.isTitleHold = false;
+  //     clearTimeout(window.titleHoldTimeoutId);
+  //   });
+  // });
+
+  document.addEventListener("gesturestart", function (e) {
+    e.preventDefault();
+    // special hack to prevent zoom-to-tabs gesture in safari
+    document.body.style.zoom = 0.99;
+  });
+
+  document.addEventListener("gesturechange", function (e) {
+    e.preventDefault();
+    // special hack to prevent zoom-to-tabs gesture in safari
+    document.body.style.zoom = 0.99;
+  });
+
+  document.addEventListener("gestureend", function (e) {
+    e.preventDefault();
+    // special hack to prevent zoom-to-tabs gesture in safari
+    document.body.style.zoom = 0.99;
+  });
+
   $("#NewGameBtn").popover({
     content: "اضغط هنا للبدء",
     trigger: "manual",
@@ -96,6 +137,7 @@ function InitAction(actionType) {
   }
   window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
   let playersList = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
+  let firstPlayerID = [...playersList].sort((x,y) => x.Score - y.Score)[0].ID
   let multipleBy = 1;
   let isHandType = false;
   let arActionName = "";
@@ -127,14 +169,23 @@ function InitAction(actionType) {
 
   let tbody = document.getElementById("PlayersInputTbody");
   tbody.innerHTML = "";
+  tbody.dataset.actionType = actionType;
   for (let i = 0; i < playersList.length; i++) {
     //tr
     let tr = document.createElement("tr");
     tr.id = "input-tr-" + playersList[i].ID;
+    // if(firstPlayerID == playersList[i].ID){
+    //   tr.classList.add("border")
+    //   tr.classList.add("border-success")
+    // }
 
     //Name
     let tdName = document.createElement("td");
     tdName.innerText = playersList[i].Name;
+    if(firstPlayerID == playersList[i].ID){
+      tdName.classList.add("text-success")
+      tdName.classList.add("font-weight-bold")
+    }
     tr.appendChild(tdName);
 
     //Score
@@ -197,9 +248,14 @@ function InitAction(actionType) {
     tr.appendChild(tdActions);
     tbody.appendChild(tr);
   }
-  $("#PlayersInputModal").modal("toggle");
+  $("#PlayersInputModal").modal("show");
 }
-
+function ReInitAction() {
+  let playersInputTbody = document.getElementById("PlayersInputTbody");
+  if (playersInputTbody.dataset.actionType != undefined && playersInputTbody.dataset.actionType != null) {
+    InitAction(playersInputTbody.dataset.actionType);
+  }
+}
 function DoAction() {
   let gameInfo = localStorage.getItem("gameInfo");
   gameInfo = JSON.parse(gameInfo);
@@ -209,7 +265,8 @@ function DoAction() {
     let playerID = playersList[i].ID;
     let input = document.getElementById("input-box-" + playerID);
     if (input != null && input.value.match("^-?[0-9]+$")) {
-      window.gameInfo.players[i].Score += parseInt(input.value);
+      let playerIdx = window.gameInfo.players.findIndex((x) => x.ID == playerID);
+      window.gameInfo.players[playerIdx].Score += parseInt(input.value);
     }
   }
   //   window.gameInfo.players = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
@@ -308,7 +365,7 @@ function PopulateLosersTable() {
       tbody.appendChild(tr);
     }
     document.getElementById("LosersTable").style.display = "table";
-  }else{
+  } else {
     document.getElementById("LosersTable").style.display = "none";
   }
 }
