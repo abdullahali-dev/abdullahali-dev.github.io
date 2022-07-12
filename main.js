@@ -137,6 +137,7 @@ function InitAction(actionType) {
   }
   window.gameInfo.players = window.gameInfo.players.sort((x, y) => x.ID - y.ID);
   let playersList = window.gameInfo.players.filter((player) => player.Score < window.gameInfo.maxScore);
+  let notFirstGame = playersList.filter((x) => x.Score != 0).length > 0;
   let firstPlayerID = [...playersList].sort((x,y) => x.Score - y.Score)[0].ID
   let multipleBy = 1;
   let isHandType = false;
@@ -174,15 +175,11 @@ function InitAction(actionType) {
     //tr
     let tr = document.createElement("tr");
     tr.id = "input-tr-" + playersList[i].ID;
-    // if(firstPlayerID == playersList[i].ID){
-    //   tr.classList.add("border")
-    //   tr.classList.add("border-success")
-    // }
-
+    
     //Name
     let tdName = document.createElement("td");
     tdName.innerText = playersList[i].Name;
-    if(firstPlayerID == playersList[i].ID){
+    if(notFirstGame && firstPlayerID == playersList[i].ID ){
       tdName.classList.add("text-success")
       tdName.classList.add("font-weight-bold")
     }
