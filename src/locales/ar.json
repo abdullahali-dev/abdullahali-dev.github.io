@@ -45,7 +45,8 @@
       "close": "إغلاق",
       "added": "أضيف",
       "removed": "حذف",
-      "noChanges": "لا توجد تغييرات"
+      "noChanges": "لا توجد تغييرات",
+      "rolledBack": "تم التراجع"
     }
   },
   "prompts": {
