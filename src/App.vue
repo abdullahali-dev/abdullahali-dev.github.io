@@ -3,15 +3,15 @@
     <div class="content-wrap">
       <div class="card bg-dark text-white border-white">
         <div class="card-header border-white">
-          <div class="card-title">
-            <h4 class="d-inline noselect" id="title" style="user-select: none">نشرة كنكان</h4>
-            <button
+          <div class="card-title d-flex justify-content-between">
+              <button
               id="NewGameBtn"
               class="btn btn-info btn-new-game float-left d-inline"
               @click="openNewGameDialog"
-            >
+              >
               لعبة جديدة
             </button>
+            <h4 class="d-inline noselect" id="title" style="user-select: none">نشرة كنكان</h4>
           </div>
         </div>
         <div class="card-body p-2" dir="rtl">
