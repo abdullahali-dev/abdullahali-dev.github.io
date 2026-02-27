@@ -5,7 +5,8 @@
     "newGame": "لعبة جديدة",
     "undo": "تراجع",
     "redo": "إعادة",
-    "history": "السجل"
+    "history": "السجل",
+    "editMaxScore": "تعديل الحد الأعلى للنقاط"
   },
   "actions": {
     "hand": "هند",
@@ -52,7 +53,10 @@
   "prompts": {
     "maxScore": "الحد الأعلى للنقاط",
     "invalidNumber": "يجب ادخال رقم صحيح",
-    "createGameFirst": "قم بإنشاء لعبة جديدة أولاً"
+    "createGameFirst": "قم بإنشاء لعبة جديدة أولاً",
+    "invalidMaxScore": "الحد الأعلى للنقاط يجب أن يكون رقماً موجباً",
+    "maxScoreLessThanCurrent": "الحد الأعلى الجديد يجب أن يكون أكبر من أو يساوي أعلى نقاط حالية",
+    "currentMaxScore": "الحد الأعلى الحالي"
   },
   "footer": {
     "createdBy": "Create by",

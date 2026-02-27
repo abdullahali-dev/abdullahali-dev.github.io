@@ -17,7 +17,14 @@
         <div class="card-body p-2" dir="rtl">
           <!-- Max Score Display -->
           <div v-if="gameInfo" class="text-center text-white-50" role="alert">
-            <strong>الحد الأعلى للنقاط: {{ gameInfo.maxScore }}</strong>
+            <button
+              @click="openEditMaxScoreDialog"
+              class="btn btn-sm btn-outline-info"
+              style="padding: 0.25rem 0.5rem; font-size: 0.9rem"
+              :title="t('app.editMaxScore')"
+            >
+              <strong>{{ t('app.maxScore') }}: {{ gameInfo.maxScore }}</strong>
+            </button>
           </div>
 
           <div class="m-2 justify-content-center">
@@ -203,6 +210,69 @@ export default {
       historyUtils.saveHistory(newGameInfo.gameId, []);
     };
 
+    const openEditMaxScoreDialog = () => {
+      if (!gameInfo.value) return;
+
+      const currentMaxScore = gameInfo.value.maxScore;
+      const newMaxScore = window.prompt(
+        `${t('prompts.currentMaxScore')}: ${currentMaxScore}\n${t('prompts.maxScore')}`,
+        currentMaxScore.toString()
+      );
+
+      if (newMaxScore === null) return;
+
+      // Trim and validate
+      const trimmedScore = newMaxScore.trim();
+
+      // Check if it's a valid number
+      if (!trimmedScore.match('^[0-9]+$')) {
+        alert(t('prompts.invalidMaxScore'));
+        return;
+      }
+
+      const parsedScore = parseInt(trimmedScore, 10);
+
+      // Validate that new score is positive
+      if (parsedScore <= 0) {
+        alert(t('prompts.invalidMaxScore'));
+        return;
+      }
+
+      // Check if new max score is less than current highest player score
+      const highestPlayerScore = Math.max(
+        ...gameInfo.value.players.map((p) => p.Score),
+        0
+      );
+
+      if (parsedScore < highestPlayerScore) {
+        alert(
+          `${t('prompts.maxScoreLessThanCurrent')}: ${highestPlayerScore}`
+        );
+        return;
+      }
+
+      // Update max score
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      gameInfo.value.maxScore = parsedScore;
+
+      // Save to localStorage
+      gameUtils.saveGameInfo(gameInfo.value);
+
+      // Add to history
+      const playerChanges = [
+        {
+          playerId: 'maxScore',
+          playerName: `${t('app.maxScore')}`,
+          type: 'maxScoreChange',
+          scoreBefore: currentMaxScore,
+          scoreAfter: parsedScore,
+          scoreChange: parsedScore - currentMaxScore
+        }
+      ];
+
+      addEvent('max_score_update', t('app.editMaxScore'), beforeState, playerChanges);
+    };
+
     const addEvent = (type, actionName, beforeState, playerChanges, actionKey = null) => {
       // Clear redo stack when a new action is taken
       removedEvents.value = [];
@@ -234,9 +304,8 @@ export default {
         return;
       }
 
-      gameUtils.addPlayer(gameInfo.value, playerNameInput.value);
+      handleAddPlayerEvent(playerNameInput.value);
       playerNameInput.value = '';
-      gameInfo.value = { ...gameInfo.value };
     };
 
     const handleAddPlayerEvent = (playerName) => {
@@ -245,8 +314,29 @@ export default {
         return;
       }
 
-      gameUtils.addPlayer(gameInfo.value, playerName);
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      
+      // Calculate top player score + 25
+      const topPlayerScore = Math.max(...gameInfo.value.players.map((p) => p.Score), 0);
+      const startingScore = topPlayerScore + 25;
+      
+      // Add player with calculated starting score
+      const newPlayer = gameUtils.addPlayer(gameInfo.value, playerName, startingScore);
       gameInfo.value = { ...gameInfo.value };
+      
+      // Record event for adding player
+      if (newPlayer) {
+        const playerChanges = [{
+          playerId: newPlayer.ID,
+          playerName: newPlayer.Name,
+          type: 'added',
+          scoreBefore: 0,
+          scoreAfter: startingScore,
+          scoreChange: startingScore
+        }];
+        
+        addEvent('add_player', `${t('deletePlayer.message').replace('حذف', 'إضافة')}: ${newPlayer.Name}`, beforeState, playerChanges);
+      }
     };
 
     const removePlayer = (playerId) => {
@@ -365,6 +455,7 @@ export default {
       canRedo,
       t,
       openNewGameDialog,
+      openEditMaxScoreDialog,
       addPlayer,
       handleAddPlayerEvent,
       removePlayer,

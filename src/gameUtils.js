@@ -57,7 +57,7 @@ export const gameUtils = {
   /**
    * Add a new player to the game
    */
-  addPlayer(gameInfo, playerName) {
+  addPlayer(gameInfo, playerName, startingScore = 0) {
     if (!playerName || playerName.trim() === '') {
       return null;
     }
@@ -65,7 +65,7 @@ export const gameUtils = {
     const newPlayer = {
       ID: Date.now(),
       Name: playerName,
-      Score: 0
+      Score: startingScore
     };
 
     gameInfo.players.push(newPlayer);
