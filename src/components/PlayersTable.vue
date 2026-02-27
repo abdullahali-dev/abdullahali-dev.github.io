@@ -32,14 +32,14 @@
           {{ player.Name }}
         </td>
         <td>{{ player.Score }}</td>
-        <td>
-          <button
-            class="btn-close text-danger float-left d-inline"
+        <td class="d-flex justify-content-between align-items-center" style="direction: ltr">
+          <a
+            class="text-decoration-none px-3 text-danger float-left d-inline"
             style="margin-left: 2px"
             @click="handleRemovePlayer(player.ID)"
           >
             X
-          </button>
+        </a>
           <span
             v-if="
               activePlayers.length > 1 &&

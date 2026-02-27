@@ -3,7 +3,7 @@
     <div class="content-wrap">
       <div class="card bg-dark text-white border-white">
         <div class="card-header border-white">
-          <div class="card-title d-flex justify-content-between">
+          <div class="card-title d-flex justify-content-between align-items-center">
               <button
               id="NewGameBtn"
               class="btn btn-info btn-new-game float-left d-inline"
@@ -11,7 +11,7 @@
               >
               لعبة جديدة
             </button>
-            <h4 class="d-inline noselect" id="title" style="user-select: none">نشرة كنكان</h4>
+            <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">نشرة كنكان</h4>
           </div>
         </div>
         <div class="card-body p-2" dir="rtl">
@@ -39,11 +39,31 @@
               <button
                 id="BtnUndo"
                 class="btn btn-outline-success"
-                style="width: 240px; margin: 4px; max-width: 100%"
+                style="width: 110px; margin: 4px"
                 @click="undo"
+                :disabled="!canUndo"
                 type="button"
               >
                 تراجع
+              </button>
+              <button
+                id="BtnRedo"
+                class="btn btn-outline-success"
+                style="width: 110px; margin: 4px"
+                @click="redo"
+                :disabled="!canRedo"
+                type="button"
+              >
+                إعادة
+              </button>
+              <button
+                id="BtnHistory"
+                class="btn btn-outline-info"
+                style="width: 110px; margin: 4px"
+                @click="openHistory"
+                type="button"
+              >
+                السجل
               </button>
             </div>
           </div>
@@ -76,27 +96,40 @@
       @update:scores="updateScores"
       @close="closeScoreModal"
     />
+
+    <!-- History Modal -->
+    <HistoryModal
+      v-if="showHistoryModal"
+      :events="events"
+      @close="closeHistoryModal"
+    />
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import PlayersTable from './components/PlayersTable.vue';
 import LosersTable from './components/LosersTable.vue';
 import ScoreInputModal from './components/ScoreInputModal.vue';
+import HistoryModal from './components/HistoryModal.vue';
 import { gameUtils } from './gameUtils';
+import { historyUtils } from './historyUtils';
 
 export default {
   components: {
     PlayersTable,
     LosersTable,
-    ScoreInputModal
+    ScoreInputModal,
+    HistoryModal
   },
   setup() {
     const gameInfo = ref(null);
     const playerNameInput = ref('');
     const showScoreModal = ref(false);
     const currentActionType = ref('');
+    const showHistoryModal = ref(false);
+    const events = ref([]);
+    const historyPosition = ref(0);
 
     const activePlayers = computed(() => {
       return gameInfo.value ? gameUtils.getSortedActivePlayers(gameInfo.value) : [];
@@ -105,6 +138,10 @@ export default {
     const loserPlayers = computed(() => {
       return gameInfo.value ? gameUtils.getLoserPlayers(gameInfo.value) : [];
     });
+
+    const canUndo = computed(() => historyPosition.value > 0);
+
+    const canRedo = computed(() => historyPosition.value < events.value.length);
 
     onMounted(() => {
       registerServiceWorker();
@@ -139,6 +176,9 @@ export default {
       const saved = gameUtils.loadGameInfo();
       if (saved) {
         gameInfo.value = saved;
+        // Load history for this game
+        events.value = historyUtils.loadHistory(saved.gameId);
+        historyPosition.value = events.value.length;
       }
     };
 
@@ -152,8 +192,34 @@ export default {
       }
 
       const existingPlayers = gameInfo.value ? gameInfo.value.players : [];
-      gameUtils.backupGameInfo(gameInfo.value || {});
-      gameInfo.value = gameUtils.createNewGame(maxScore, existingPlayers);
+      const newGameInfo = gameUtils.createNewGame(maxScore, existingPlayers);
+      gameInfo.value = newGameInfo;
+      
+      // Reset history for new game
+      events.value = [];
+      historyPosition.value = 0;
+      historyUtils.saveHistory(newGameInfo.gameId, []);
+    };
+
+    const addEvent = (type, actionName, beforeState, playerChanges) => {
+      // Only keep events up to current position (discard the redo stack)
+      events.value = events.value.slice(0, historyPosition.value);
+      
+      const event = historyUtils.createEvent(
+        type,
+        actionName,
+        beforeState,
+        gameInfo.value,
+        playerChanges
+      );
+      
+      events.value.push(event);
+      historyPosition.value = events.value.length;
+      
+      // Save to localStorage
+      if (gameInfo.value) {
+        historyUtils.saveHistory(gameInfo.value.gameId, events.value);
+      }
     };
 
     const addPlayer = () => {
@@ -184,9 +250,22 @@ export default {
     const removePlayer = (playerId) => {
       if (!confirm('هل انت متأكد ؟')) return;
 
-      gameUtils.backupGameInfo(gameInfo.value);
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      const removedPlayer = gameInfo.value.players.find((p) => p.ID === playerId);
+      
       gameUtils.removePlayer(gameInfo.value, playerId);
       gameInfo.value = { ...gameInfo.value };
+      
+      const playerChanges = [{
+        playerId: playerId,
+        playerName: removedPlayer.Name,
+        type: 'removed',
+        scoreBefore: removedPlayer.Score,
+        scoreAfter: 0,
+        scoreChange: -removedPlayer.Score
+      }];
+      
+      addEvent('remove_player', `حذف اللاعب: ${removedPlayer.Name}`, beforeState, playerChanges);
     };
 
     const initAction = (actionType) => {
@@ -200,13 +279,17 @@ export default {
     };
 
     const updateScores = (scores) => {
-      gameUtils.backupGameInfo(gameInfo.value);
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      const beforePlayers = JSON.parse(JSON.stringify(gameInfo.value.players));
 
       Object.entries(scores).forEach(([playerId, score]) => {
         if (Number.isInteger(score)) {
           gameUtils.updatePlayerScore(gameInfo.value, parseInt(playerId), score);
         }
       });
+
+      const playerChanges = historyUtils.calculatePlayerChanges(beforePlayers, gameInfo.value.players);
+      addEvent('score_update', currentActionType.value, beforeState, playerChanges);
 
       gameInfo.value = { ...gameInfo.value };
       showScoreModal.value = false;
@@ -217,10 +300,34 @@ export default {
     };
 
     const undo = () => {
-      const backup = gameUtils.loadGameBackup();
-      if (backup && backup.players) {
-        gameInfo.value = backup;
+      if (!canUndo.value) return;
+      
+      historyPosition.value--;
+      const previousEvent = events.value[historyPosition.value - 1];
+      
+      if (previousEvent) {
+        gameInfo.value = JSON.parse(JSON.stringify(previousEvent.afterState));
+      } else {
+        gameInfo.value = JSON.parse(JSON.stringify(events.value[0]?.beforeState));
       }
+    };
+
+    const redo = () => {
+      if (!canRedo.value) return;
+      
+      const event = events.value[historyPosition.value];
+      if (event) {
+        gameInfo.value = JSON.parse(JSON.stringify(event.afterState));
+        historyPosition.value++;
+      }
+    };
+
+    const openHistory = () => {
+      showHistoryModal.value = true;
+    };
+
+    const closeHistoryModal = () => {
+      showHistoryModal.value = false;
     };
 
     return {
@@ -228,8 +335,12 @@ export default {
       playerNameInput,
       showScoreModal,
       currentActionType,
+      showHistoryModal,
+      events,
       activePlayers,
       loserPlayers,
+      canUndo,
+      canRedo,
       openNewGameDialog,
       addPlayer,
       handleAddPlayerEvent,
@@ -237,7 +348,10 @@ export default {
       initAction,
       updateScores,
       closeScoreModal,
-      undo
+      undo,
+      redo,
+      openHistory,
+      closeHistoryModal
     };
   }
 };

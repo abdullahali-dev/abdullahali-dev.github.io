@@ -2,15 +2,15 @@
   <div class="modal fade show" id="PlayersInputModal" style="display: block" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content bg-dark text-white border-white p-1" dir="rtl">
-        <div class="modal-header bg-dark text-white border-white">
-          <h4 class="modal-title">تسجيل</h4>
-          <button
+        <div class="modal-header bg-dark text-white border-white d-flex justify-content-between">
+            <h4 class="modal-title">تسجيل</h4>
+            <button
             class="btn btn-sm btn-outline-warning float-left"
             type="button"
             @click="reinitAction"
-          >
+            >
             مسح
-          </button>
+        </button>
         </div>
         <div class="modal-body p-1">
           <table class="table text-center table-dark">
@@ -29,20 +29,9 @@
                     :id="'input-box-' + player.ID"
                     v-model.number="scores[player.ID]"
                     type="tel"
-                    style="
-                      position: absolute;
-                      display: block;
-                      top: 20%;
-                      left: 0;
-                      margin: 0;
-                      height: 60%;
-                      width: 100%;
-                      border: none;
-                      box-sizing: border-box;
-                      text-align: center;
-                      font-size: 1.1em;
-                      border-radius: 5px;
-                    "
+                    class="form-control text-center p-0"
+                    placeholder="0"
+                    maxlength="4"
                     @click="clearInput('input-box-' + player.ID)"
                   />
                 </td>
