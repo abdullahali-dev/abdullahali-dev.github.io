@@ -14,7 +14,6 @@
               v-for="(event, index) in formattedEvents"
               :key="event.id"
               class="accordion-item"
-              :class="{ 'rolled-back': isRolledBack(index) }"
             >
               <h2 class="accordion-header m-0">
                 <button
@@ -23,14 +22,15 @@
                   :data-bs-target="`#event-${event.id}`"
                   data-bs-toggle="collapse"
                 >
-                  <div class="w-100 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2" style="flex: 1">
-                      <div :class="{ 'fw-bold': !isRolledBack(index), 'text-muted text-decoration-line-through': isRolledBack(index) }">
-                        {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
+                  <div class="w-100">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap">
+                      <div class="flex-grow-1">
+                        <span class="fw-bold">
+                          {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
+                        </span>
                       </div>
-                      <span v-if="isRolledBack(index)" class="badge bg-warning text-dark" style="font-size: 0.7rem">{{ t('modal.history.rolledBack') }}</span>
+                      <small class="text-muted ms-2" style="font-size: 0.8rem; white-space: nowrap">{{ event.displayTime }}</small>
                     </div>
-                    <small class="d-block ms-3" style="font-size: 0.8rem">{{ event.displayTime }}</small>
                   </div>
                 </button>
               </h2>
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { historyUtils } from '../historyUtils';
 
@@ -96,10 +96,6 @@ export default {
     events: {
       type: Array,
       required: true
-    },
-    historyPosition: {
-      type: Number,
-      default: 0
     }
   },
   emits: ['close'],
@@ -132,10 +128,6 @@ export default {
       return '';
     };
 
-    const isRolledBack = (index) => {
-      return index >= props.historyPosition;
-    };
-
     const closeModal = () => {
       emit('close');
     };
@@ -145,7 +137,6 @@ export default {
       formattedEvents,
       getRowClass,
       getScoreChangeClass,
-      isRolledBack,
       closeModal
     };
   }
@@ -177,10 +168,6 @@ export default {
   border-bottom: 1px solid #495057;
 }
 
-.accordion-item.rolled-back {
-  opacity: 0.6;
-}
-
 .accordion-item:first-child {
   border-top: 1px solid #495057;
 }
@@ -192,11 +179,6 @@ export default {
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
   transition: background-color 0.15s ease-in-out;
-}
-
-.accordion-item.rolled-back .accordion-button {
-  background-color: #3d4449;
-  color: #999;
 }
 
 .accordion-button:not(.collapsed) {
@@ -230,9 +212,5 @@ export default {
 .table {
   margin-bottom: 0;
   background-color: #343a40;
-}
-
-.gap-2 {
-  gap: 0.5rem;
 }
 </style>

@@ -101,7 +101,6 @@
     <HistoryModal
       v-if="showHistoryModal"
       :events="events"
-      :historyPosition="historyPosition"
       @close="closeHistoryModal"
     />
   </div>
