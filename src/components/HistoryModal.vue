@@ -9,60 +9,59 @@
           <div v-if="formattedEvents.length === 0" class="text-center p-4">
             <p>{{ t('modal.history.noEvents') }}</p>
           </div>
-          <div v-else>
+          <div v-else class="accordion accordion-flush" id="historyAccordion">
             <div
               v-for="(event, index) in formattedEvents"
               :key="event.id"
-              class="border-bottom event-item"
+              class="accordion-item"
             >
-              <div
-                class="p-3 d-flex justify-content-between align-items-start cursor-pointer event-header"
-                style="background-color: #495057"
-                @click="toggleExpanded(event.id)"
-              >
-                <div class="flex-grow-1 mr-2">
-                  <div class="mb-2">
-                    <strong style="font-size: 1.05rem">
-                      {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
-                    </strong>
-                  </div>
-                  <small class="badge badge-info mt-2">{{ event.displayTime }}</small>
-                </div>
+              <h2 class="accordion-header m-0">
                 <button
+                  class="accordion-button collapsed ps-3 pe-3 bg-transparent"
                   type="button"
-                  class="btn btn-sm btn-outline-light flex-shrink-0 expand-btn"
-                  :class="{ collapsed: !isExpanded(event.id) }"
+                  :data-bs-target="`#event-${event.id}`"
+                  data-bs-toggle="collapse"
                 >
-                  {{ isExpanded(event.id) ? '▼' : '▶' }}
+                  <div class="w-100 d-flex justify-content-between align-items-center">
+                    <div class="fw-bold mb-1">
+                      {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
+                    </div>
+                    <small class="d-block ms-3" style="font-size: 0.8rem">{{ event.displayTime }}</small>
+                  </div>
                 </button>
-              </div>
-              <div v-if="isExpanded(event.id)" class="p-3" style="background-color: #343a40">
-                <h6 class="mb-3">{{ t('modal.history.details') }}</h6>
-                <div class="table-responsive">
-                  <table class="table table-sm table-dark mb-0">
-                    <thead>
-                      <tr>
-                        <th style="font-size: 0.9rem">{{ t('players.name') }}</th>
-                        <th style="font-size: 0.9rem">{{ t('modal.history.before') }}</th>
-                        <th style="font-size: 0.9rem">{{ t('modal.history.after') }}</th>
-                        <th style="font-size: 0.9rem">{{ t('modal.history.change') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="change in event.playerChanges"
-                        :key="change.playerId"
-                        :class="getRowClass(change)"
-                      >
-                        <td>{{ change.playerName }}</td>
-                        <td>{{ change.scoreBefore }}</td>
-                        <td>{{ change.scoreAfter }}</td>
-                        <td :class="getScoreChangeClass(change.scoreChange)">
-                          <strong>{{ change.scoreChange >= 0 ? '+' : '' }}{{ change.scoreChange }}</strong>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+              </h2>
+              <div
+                :id="`event-${event.id}`"
+                class="accordion-collapse collapse"
+                :data-bs-parent="`#historyAccordion`"
+              >
+                <div class="accordion-body">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-dark mb-0">
+                      <thead>
+                        <tr style="background-color: #495057">
+                          <th style="font-size: 0.9rem" class="px-2">{{ t('players.name') }}</th>
+                          <th style="font-size: 0.9rem" class="text-center">{{ t('modal.history.before') }}</th>
+                          <th style="font-size: 0.9rem" class="text-center">{{ t('modal.history.after') }}</th>
+                          <th style="font-size: 0.9rem" class="text-center">{{ t('modal.history.change') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="change in event.playerChanges"
+                          :key="change.playerId"
+                          :class="getRowClass(change)"
+                        >
+                          <td class="px-2">{{ change.playerName }}</td>
+                          <td class="text-center">{{ change.scoreBefore }}</td>
+                          <td class="text-center">{{ change.scoreAfter }}</td>
+                          <td class="text-center" :class="getScoreChangeClass(change.scoreChange)">
+                            <strong>{{ change.scoreChange >= 0 ? '+' : '' }}{{ change.scoreChange }}</strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -98,7 +97,6 @@ export default {
   emits: ['close'],
   setup(props, { emit }) {
     const { t } = useI18n();
-    const expandedIds = ref(new Set());
 
     const formattedEvents = computed(() => {
       return props.events.map((event) => historyUtils.formatEvent(event));
@@ -112,20 +110,6 @@ export default {
       let translated = summary.replace(/ added/g, ` ${t('modal.history.added')}`);
       translated = translated.replace(/ removed/g, ` ${t('modal.history.removed')}`);
       return translated;
-    };
-
-    const toggleExpanded = (id) => {
-      const newSet = new Set(expandedIds.value);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      expandedIds.value = newSet;
-    };
-
-    const isExpanded = (id) => {
-      return expandedIds.value.has(id);
     };
 
     const getRowClass = (change) => {
@@ -147,12 +131,8 @@ export default {
     return {
       t,
       formattedEvents,
-      expandedIds,
-      toggleExpanded,
-      isExpanded,
       getRowClass,
       getScoreChangeClass,
-      translateSummary,
       closeModal
     };
   }
@@ -165,43 +145,6 @@ export default {
   z-index: 1050;
 }
 
-.cursor-pointer {
-  cursor: pointer;
-  user-select: none;
-}
-
-.cursor-pointer:hover {
-  background-color: #5a6268 !important;
-  transition: background-color 0.2s;
-}
-
-.event-item {
-  margin-bottom: 0;
-}
-
-.event-header {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.event-header:hover {
-  background-color: #5a6268 !important;
-}
-
-.expand-btn {
-  min-width: 36px;
-  margin-left: 10px;
-}
-
-.expand-btn .collapsed {
-  transform: rotate(-90deg);
-  transition: transform 0.2s;
-}
-
-.table-responsive {
-  overflow-x: auto;
-}
-
 .modal-header {
   padding: 1.2rem;
 }
@@ -211,11 +154,59 @@ export default {
   overflow-y: auto;
 }
 
-.table {
-  margin-bottom: 0;
+.accordion {
+  background-color: transparent;
+  border: none;
 }
 
-.badge {
-  white-space: nowrap;
+.accordion-item {
+  background-color: transparent;
+  border-bottom: 1px solid #495057;
+}
+
+.accordion-item:first-child {
+  border-top: 1px solid #495057;
+}
+
+.accordion-button {
+  background-color: #495057;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #5a6268;
+  box-shadow: none;
+  color: white;
+}
+
+.accordion-button:hover {
+  background-color: #5a6268;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: transparent;
+  background-color: #5a6268;
+  color: white;
+}
+
+.accordion-button::after {
+  filter: brightness(0) invert(1);
+  margin-start: auto;
+  margin-end: 0;
+}
+
+.accordion-body {
+  background-color: #343a40;
+  padding: 0;
+}
+
+.table {
+  margin-bottom: 0;
+  background-color: #343a40;
 }
 </style>

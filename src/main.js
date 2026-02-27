@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import i18n from './i18n'
 import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/js/bootstrap.bundle.js'
 
 const app = createApp(App)
 
