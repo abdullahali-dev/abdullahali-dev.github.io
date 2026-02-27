@@ -15,6 +15,11 @@
           </div>
         </div>
         <div class="card-body p-2" dir="rtl">
+          <!-- Max Score Display -->
+          <div v-if="gameInfo" class="alert alert-info text-center mb-3" role="alert">
+            <strong>الحد الأعلى للنقاط: {{ gameInfo.maxScore }}</strong>
+          </div>
+
           <div class="m-2 justify-content-center">
             <div class="col-12 text-center">
               <button class="btn btn-success btn-action m-1" @click="initAction('Hand')">
