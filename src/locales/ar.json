@@ -48,7 +48,12 @@
       "added": "أضيف",
       "removed": "حذف",
       "noChanges": "لا توجد تغييرات",
-      "rolledBack": "تم التراجع"
+      "rolledBack": "تم التراجع",
+      "ago": "منذ",
+      "second": "ثانية",
+      "seconds": "ثواني",
+      "minute": "دقيقة",
+      "minutes": "دقائق"
     }
   },
   "prompts": {

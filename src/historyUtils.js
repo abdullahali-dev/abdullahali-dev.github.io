@@ -114,13 +114,19 @@ export const historyUtils = {
   /**
    * Format event for display
    */
-  formatEvent(event) {
-    const date = new Date(event.timestamp);
-    const time = date.toLocaleTimeString('ar-SA', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
+  formatEvent(event, t) {
+    const diffMs = Date.now() - new Date(event.timestamp).getTime();
+    const diffSeconds = Math.floor(Math.max(0, diffMs) / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    
+    let time;
+    if (diffMinutes === 0) {
+      const secondsLabel = diffSeconds === 1 ? t('modal.history.second') : t('modal.history.seconds');
+      time = `${t('modal.history.ago')} ${diffSeconds} ${secondsLabel}`;
+    } else {
+      const minutesLabel = diffMinutes === 1 ? t('modal.history.minute') : t('modal.history.minutes');
+      time = `${t('modal.history.ago')} ${diffMinutes} ${minutesLabel}`;
+    }
 
     return {
       ...event,

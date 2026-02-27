@@ -99,7 +99,7 @@ export default {
     const { t } = useI18n();
 
     const formattedEvents = computed(() => {
-      return props.events.map((event) => historyUtils.formatEvent(event));
+      return props.events.map((event) => historyUtils.formatEvent(event, t));
     });
 
     const translateSummary = (summary) => {
