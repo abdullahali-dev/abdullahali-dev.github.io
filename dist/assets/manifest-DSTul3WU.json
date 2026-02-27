@@ -1,0 +1,21 @@
+{
+  "name": "نشرة كنكان",
+  "short_name": "نشرة كنكان",
+  "icons": [
+    {
+      "src": "./icons/180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ],
+  "lang": "ar-SA",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "background_color": "white",
+  "theme_color": "white"
+}
