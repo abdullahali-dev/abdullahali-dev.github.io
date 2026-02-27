@@ -282,7 +282,7 @@ export default {
 
       // Calculate top player score + 25
       const topPlayerScore = Math.max(...gameInfo.value.players.map((p) => p.Score), 0);
-      const startingScore = topPlayerScore + 25;
+      const startingScore = topPlayerScore > 0 ? topPlayerScore + 25 : 0;
 
       // Add player with calculated starting score
       const newPlayer = gameUtils.addPlayer(gameInfo.value, playerName, startingScore);

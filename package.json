@@ -1,6 +1,6 @@
 {
   "name": "kenkan-vue",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Kenkan Game Score Tracker App - Vue.js Version",
   "main": "index.html",
   "type": "module",

@@ -1,5 +1,4 @@
-//v-2.0.0
-const VERSION = '2.0.0';
+const VERSION = '2.0.2';
 const CACHE_NAME = `kekan-app-v${VERSION}`;
 const CRITICAL_FILES = ['./', './index.html'];
 const STATIC_FILES = [
