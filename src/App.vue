@@ -16,7 +16,7 @@
         </div>
         <div class="card-body p-2" dir="rtl">
           <!-- Max Score Display -->
-          <div v-if="gameInfo" class="alert alert-info text-center mb-3" role="alert">
+          <div v-if="gameInfo" class="text-center text-white-50" role="alert">
             <strong>الحد الأعلى للنقاط: {{ gameInfo.maxScore }}</strong>
           </div>
 
