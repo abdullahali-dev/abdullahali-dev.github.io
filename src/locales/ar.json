@@ -1,6 +1,7 @@
 {
   "app": {
     "title": "نشرة كنكان",
+    "versionDescription": "الإصدار الثاني 2026",
     "maxScore": "الحد الأعلى للنقاط",
     "newGame": "لعبة جديدة",
     "undo": "تراجع",
@@ -20,7 +21,7 @@
     "rank": "الترتيب",
     "name": "الاسم",
     "score": "النقاط",
-    "confirmDelete": "هل انت متأكد ؟",
+    "confirmDelete": "هل انت متأكد من حذف اللاعب؟",
     "distributing": "يوزع",
     "dealing": "يجرش"
   },
@@ -65,5 +66,12 @@
   },
   "deletePlayer": {
     "message": "حذف اللاعب"
+  },
+  "playerAdjustment": {
+    "addPoints": "إضافة نقاط",
+    "subtractPoints": "خصم نقاط",
+    "enterPoints": "أدخل عدد النقاط",
+    "invalidPoints": "يجب إدخال رقم صحيح",
+    "negativeScore": "رصيد اللاعب لا يمكن أن يكون سالباً"
   }
 }

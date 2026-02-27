@@ -4,25 +4,20 @@
       <div class="card bg-dark text-white border-white">
         <div class="card-header border-white">
           <div class="card-title d-flex justify-content-between align-items-center">
-              <button
-              id="NewGameBtn"
-              class="btn btn-info btn-new-game float-left d-inline"
-              @click="openNewGameDialog"
-              >
+            <button id="NewGameBtn" class="btn btn-info btn-new-game float-left d-inline" @click="openNewGameDialog">
               {{ t('app.newGame') }}
             </button>
-            <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">{{ t('app.title') }}</h4>
+            <div>
+              <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">{{ t('app.title') }}</h4>
+              <small class="text-darkgray">{{ t('app.versionDescription') }}</small>
+            </div>
           </div>
         </div>
         <div class="card-body p-2" dir="rtl">
           <!-- Max Score Display -->
           <div v-if="gameInfo" class="text-center text-white-50" role="alert">
-            <button
-              @click="openEditMaxScoreDialog"
-              class="btn btn-sm btn-outline-info"
-              style="padding: 0.25rem 0.5rem; font-size: 0.9rem"
-              :title="t('app.editMaxScore')"
-            >
+            <button @click="openEditMaxScoreDialog" class="btn btn-sm btn-outline-info"
+              style="padding: 0.25rem 0.5rem; font-size: 0.9rem" :title="t('app.editMaxScore')">
               <strong>{{ t('app.maxScore') }}: {{ gameInfo.maxScore }}</strong>
             </button>
           </div>
@@ -43,45 +38,24 @@
               </button>
             </div>
             <div class="col-12 text-center">
-              <button
-                id="BtnUndo"
-                class="btn btn-outline-success"
-                style="width: 110px; margin: 4px"
-                @click="undo"
-                :disabled="!canUndo"
-                type="button"
-              >
+              <button id="BtnUndo" class="btn btn-outline-success" style="width: 110px; margin: 4px" @click="undo"
+                :disabled="!canUndo" type="button">
                 {{ t('app.undo') }}
               </button>
-              <button
-                id="BtnRedo"
-                class="btn btn-outline-success"
-                style="width: 110px; margin: 4px"
-                @click="redo"
-                :disabled="!canRedo"
-                type="button"
-              >
+              <button id="BtnRedo" class="btn btn-outline-success" style="width: 110px; margin: 4px" @click="redo"
+                :disabled="!canRedo" type="button">
                 {{ t('app.redo') }}
               </button>
-              <button
-                id="BtnHistory"
-                class="btn btn-outline-info"
-                style="width: 110px; margin: 4px"
-                @click="openHistory"
-                type="button"
-              >
+              <button id="BtnHistory" class="btn btn-outline-secondary text-white-50" style="width: 110px; margin: 4px"
+                @click="openHistory" type="button">
                 {{ t('app.history') }}
               </button>
             </div>
           </div>
 
           <!-- Players Table -->
-          <PlayersTable
-            v-if="gameInfo"
-            :gameInfo="gameInfo"
-            @add-player="handleAddPlayerEvent"
-            @remove-player="removePlayer"
-          />
+          <PlayersTable v-if="gameInfo" :gameInfo="gameInfo" @add-player="handleAddPlayerEvent"
+            @remove-player="removePlayer" @add-points="addPointsToPlayer" @subtract-points="subtractPointsFromPlayer" />
 
           <hr />
 
@@ -95,21 +69,11 @@
     </div>
 
     <!-- Score Input Modal -->
-    <ScoreInputModal
-      v-if="showScoreModal"
-      :activePlayers="activePlayers"
-      :actionType="currentActionType"
-      :gameInfo="gameInfo"
-      @update:scores="updateScores"
-      @close="closeScoreModal"
-    />
+    <ScoreInputModal v-if="showScoreModal" :activePlayers="activePlayers" :actionType="currentActionType"
+      :gameInfo="gameInfo" @update:scores="updateScores" @close="closeScoreModal" />
 
     <!-- History Modal -->
-    <HistoryModal
-      v-if="showHistoryModal"
-      :events="events"
-      @close="closeHistoryModal"
-    />
+    <HistoryModal v-if="showHistoryModal" :events="events" @close="closeHistoryModal" />
   </div>
 </template>
 
@@ -203,7 +167,7 @@ export default {
       const existingPlayers = gameInfo.value ? gameInfo.value.players : [];
       const newGameInfo = gameUtils.createNewGame(maxScore, existingPlayers);
       gameInfo.value = newGameInfo;
-      
+
       // Reset history for new game
       events.value = [];
       removedEvents.value = [];
@@ -276,7 +240,7 @@ export default {
     const addEvent = (type, actionName, beforeState, playerChanges, actionKey = null) => {
       // Clear redo stack when a new action is taken
       removedEvents.value = [];
-      
+
       const event = historyUtils.createEvent(
         type,
         actionName,
@@ -285,9 +249,9 @@ export default {
         playerChanges,
         actionKey
       );
-      
+
       events.value.push(event);
-      
+
       // Save to localStorage
       if (gameInfo.value) {
         historyUtils.saveHistory(gameInfo.value.gameId, events.value);
@@ -315,15 +279,15 @@ export default {
       }
 
       const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
-      
+
       // Calculate top player score + 25
       const topPlayerScore = Math.max(...gameInfo.value.players.map((p) => p.Score), 0);
       const startingScore = topPlayerScore + 25;
-      
+
       // Add player with calculated starting score
       const newPlayer = gameUtils.addPlayer(gameInfo.value, playerName, startingScore);
       gameInfo.value = { ...gameInfo.value };
-      
+
       // Record event for adding player
       if (newPlayer) {
         const playerChanges = [{
@@ -334,7 +298,7 @@ export default {
           scoreAfter: startingScore,
           scoreChange: startingScore
         }];
-        
+
         addEvent('add_player', `${t('deletePlayer.message').replace('حذف', 'إضافة')}: ${newPlayer.Name}`, beforeState, playerChanges);
       }
     };
@@ -344,10 +308,10 @@ export default {
 
       const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
       const removedPlayer = gameInfo.value.players.find((p) => p.ID === playerId);
-      
+
       gameUtils.removePlayer(gameInfo.value, playerId);
       gameInfo.value = { ...gameInfo.value };
-      
+
       const playerChanges = [{
         playerId: playerId,
         playerName: removedPlayer.Name,
@@ -356,8 +320,96 @@ export default {
         scoreAfter: 0,
         scoreChange: -removedPlayer.Score
       }];
-      
+
       addEvent('remove_player', `${t('deletePlayer.message')}: ${removedPlayer.Name}`, beforeState, playerChanges);
+    };
+
+    const addPointsToPlayer = ({ playerId, playerName }) => {
+      const pointsInput = window.prompt(
+        `${t('playerAdjustment.enterPoints')} - ${playerName}`
+      );
+
+      if (pointsInput === null) return;
+
+      const points = parseInt(pointsInput, 10);
+
+      // Validate input
+      if (isNaN(points) || !Number.isInteger(points)) {
+        alert(t('playerAdjustment.invalidPoints'));
+        return;
+      }
+
+      if (points <= 0) {
+        alert(t('playerAdjustment.invalidPoints'));
+        return;
+      }
+
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      const player = gameInfo.value.players.find((p) => p.ID === playerId);
+
+      if (!player) return;
+
+      const scoreBefore = player.Score;
+      player.Score += points;
+      gameInfo.value = { ...gameInfo.value };
+      gameUtils.saveGameInfo(gameInfo.value);
+
+      const playerChanges = [{
+        playerId: playerId,
+        playerName: playerName,
+        scoreBefore: scoreBefore,
+        scoreAfter: player.Score,
+        scoreChange: points
+      }];
+
+      addEvent('add_points', `${t('playerAdjustment.addPoints')}: ${playerName}`, beforeState, playerChanges);
+    };
+
+    const subtractPointsFromPlayer = ({ playerId, playerName }) => {
+      const player = gameInfo.value.players.find((p) => p.ID === playerId);
+
+      if (!player) return;
+
+      const pointsInput = window.prompt(
+        `${t('playerAdjustment.enterPoints')} - ${playerName}\n${t('players.score')}: ${player.Score}`
+      );
+
+      if (pointsInput === null) return;
+
+      const points = parseInt(pointsInput, 10);
+
+      // Validate input
+      if (isNaN(points) || !Number.isInteger(points)) {
+        alert(t('playerAdjustment.invalidPoints'));
+        return;
+      }
+
+      if (points <= 0) {
+        alert(t('playerAdjustment.invalidPoints'));
+        return;
+      }
+
+      // Check if score won't go negative
+      // if (player.Score - points < 0) {
+      //   alert(t('playerAdjustment.negativeScore'));
+      //   return;
+      // }
+
+      const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
+      const scoreBefore = player.Score;
+      player.Score -= points;
+      gameInfo.value = { ...gameInfo.value };
+      gameUtils.saveGameInfo(gameInfo.value);
+
+      const playerChanges = [{
+        playerId: playerId,
+        playerName: playerName,
+        scoreBefore: scoreBefore,
+        scoreAfter: player.Score,
+        scoreChange: -points
+      }];
+
+      addEvent('subtract_points', `${t('playerAdjustment.subtractPoints')}: ${playerName}`, beforeState, playerChanges);
     };
 
     const initAction = (actionType) => {
@@ -394,13 +446,13 @@ export default {
 
     const undo = () => {
       if (!canUndo.value) return;
-      
+
       // Remove the last event from history
       const removedEvent = events.value.pop();
-      
+
       // Push to removed events stack for redo
       removedEvents.value.push(removedEvent);
-      
+
       // Restore game state to before this event
       if (events.value.length > 0) {
         // Restore to the state at the end of the previous event
@@ -409,7 +461,7 @@ export default {
         // No events left, restore to the initial state (beforeState of the removed event)
         gameInfo.value = JSON.parse(JSON.stringify(removedEvent.beforeState));
       }
-      
+
       // Save updated history to localStorage
       if (gameInfo.value) {
         historyUtils.saveHistory(gameInfo.value.gameId, events.value);
@@ -418,16 +470,16 @@ export default {
 
     const redo = () => {
       if (!canRedo.value) return;
-      
+
       // Restore the last removed event
       const restoredEvent = removedEvents.value.pop();
-      
+
       // Push back to events history
       events.value.push(restoredEvent);
-      
+
       // Restore game state to after this event
       gameInfo.value = JSON.parse(JSON.stringify(restoredEvent.afterState));
-      
+
       // Save updated history to localStorage
       if (gameInfo.value) {
         historyUtils.saveHistory(gameInfo.value.gameId, events.value);
@@ -459,6 +511,8 @@ export default {
       addPlayer,
       handleAddPlayerEvent,
       removePlayer,
+      addPointsToPlayer,
+      subtractPointsFromPlayer,
       initAction,
       updateScores,
       closeScoreModal,
