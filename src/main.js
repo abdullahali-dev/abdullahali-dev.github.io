@@ -33,10 +33,11 @@ if ('serviceWorker' in navigator) {
           ) {
             updatePromptShown = true; // Set flag to prevent repeated prompts
             
-            // Notify user about the update
-            const message = 'New version available! Please refresh your page to update.';
+            // Notify user about the update using i18n
+            const t = i18n.global.t;
+            const message = `${t('update.available')}\n${t('update.message')}\n\n${t('update.refreshNow')}`;
             
-            if (confirm(message + '\n\nRefresh now?')) {
+            if (confirm(message)) {
               // Tell service worker to skip waiting
               newWorker.postMessage({ type: 'SKIP_WAITING' });
               
