@@ -6,12 +6,13 @@ export const historyUtils = {
   /**
    * Create an event object with details of what changed
    */
-  createEvent(type, actionName, beforeState, afterState, playerChanges) {
+  createEvent(type, actionName, beforeState, afterState, playerChanges, actionKey = null) {
     return {
       id: Date.now() + Math.random(),
       timestamp: new Date().toISOString(),
       type: type, // 'score_update', 'add_player', 'remove_player', 'new_game'
       actionName: actionName, // Display name for the event,
+      actionKey: actionKey, // i18n key for the action
       beforeState: JSON.parse(JSON.stringify(beforeState)), // Deep clone
       afterState: JSON.parse(JSON.stringify(afterState)), // Deep clone
       playerChanges: playerChanges // Array of player changes
@@ -129,16 +130,16 @@ export const historyUtils = {
           ? event.playerChanges
               .map((change) => {
                 if (change.type === 'added') {
-                  return `${change.playerName} أضيف`;
+                  return `${change.playerName} ${change.type}`;
                 } else if (change.type === 'removed') {
-                  return `${change.playerName} حذف`;
+                  return `${change.playerName} ${change.type}`;
                 } else {
                   const sign = change.scoreChange >= 0 ? '+' : '';
                   return `${change.playerName}: ${sign}${change.scoreChange}`;
                 }
               })
               .join(' | ')
-          : 'لا توجد تغييرات'
+          : 'noChanges'
     };
   }
 };

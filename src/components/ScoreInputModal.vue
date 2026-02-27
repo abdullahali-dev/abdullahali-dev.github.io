@@ -3,21 +3,21 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content bg-dark text-white border-white p-1" dir="rtl">
         <div class="modal-header bg-dark text-white border-white d-flex justify-content-between">
-            <h4 class="modal-title">تسجيل</h4>
+            <h4 class="modal-title">{{ t('modal.scoreInput.title') }}</h4>
             <button
             class="btn btn-sm btn-outline-warning float-left"
             type="button"
             @click="reinitAction"
             >
-            مسح
+            {{ t('modal.scoreInput.clear') }}
         </button>
         </div>
         <div class="modal-body p-1">
           <table class="table text-center table-dark">
             <thead>
               <tr>
-                <th scope="col">الاسم</th>
-                <th scope="col">النقاط</th>
+                <th scope="col">{{ t('players.name') }}</th>
+                <th scope="col">{{ t('players.score') }}</th>
                 <th scope="col"></th>
               </tr>
             </thead>
@@ -53,7 +53,7 @@
                     :disabled="actionBtnDisabled[player.ID]"
                     @click="setWinnerScore(player.ID)"
                   >
-                    {{ actionDetails.arActionName }}
+                    {{ t(`actions.${actionDetails.actionKey}`) }}
                   </button>
                 </td>
               </tr>
@@ -67,7 +67,7 @@
             style="width: 100px"
             @click="closeModal"
           >
-            الغاء
+            {{ t('modal.scoreInput.cancel') }}
           </button>
           <button
             type="button"
@@ -75,7 +75,7 @@
             style="width: 100px"
             @click="confirmScores"
           >
-            تم
+            {{ t('modal.scoreInput.confirm') }}
           </button>
         </div>
       </div>
@@ -85,6 +85,7 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { gameUtils } from '../gameUtils';
 
 export default {
@@ -104,6 +105,7 @@ export default {
   },
   emits: ['update:scores', 'close'],
   setup(props, { emit }) {
+    const { t } = useI18n();
     const scores = ref({});
     const plusBtnDisabled = ref({});
     const actionBtnDisabled = ref({});
@@ -185,6 +187,7 @@ export default {
     initializeScores();
 
     return {
+      t,
       scores,
       plusBtnDisabled,
       actionBtnDisabled,

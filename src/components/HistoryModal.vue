@@ -3,14 +3,14 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content bg-dark text-white border-white" dir="rtl">
         <div class="modal-header bg-dark text-white border-white d-flex justify-content-between align-items-center">
-          <h4 class="modal-title mb-0">سجل الأحداث</h4>
+          <h4 class="modal-title mb-0">{{ t('modal.history.title') }}</h4>
           <button type="button" class="close text-white" @click="closeModal" style="position: static">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body p-0">
           <div v-if="formattedEvents.length === 0" class="text-center p-4">
-            <p>لا توجد أحداث</p>
+            <p>{{ t('modal.history.noEvents') }}</p>
           </div>
           <div v-else>
             <div
@@ -25,10 +25,12 @@
               >
                 <div class="flex-grow-1 mr-2">
                   <div class="mb-2">
-                    <strong style="font-size: 1.05rem">{{ event.actionName }}</strong>
+                    <strong style="font-size: 1.05rem">
+                      {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
+                    </strong>
                   </div>
                   <small class="text-muted d-block" style="line-height: 1.4; word-break: break-word; font-size: 0.85rem">
-                    {{ event.playerChangesSummary }}
+                    {{ translateSummary(event.playerChangesSummary) }}
                   </small>
                   <small class="badge badge-info mt-2">{{ event.displayTime }}</small>
                 </div>
@@ -41,15 +43,15 @@
                 </button>
               </div>
               <div v-if="isExpanded(event.id)" class="p-3" style="background-color: #343a40">
-                <h6 class="mb-3">التفاصيل:</h6>
+                <h6 class="mb-3">{{ t('modal.history.details') }}</h6>
                 <div class="table-responsive">
                   <table class="table table-sm table-dark mb-0">
                     <thead>
                       <tr>
-                        <th style="font-size: 0.9rem">اللاعب</th>
-                        <th style="font-size: 0.9rem">قبل</th>
-                        <th style="font-size: 0.9rem">بعد</th>
-                        <th style="font-size: 0.9rem">التغيير</th>
+                        <th style="font-size: 0.9rem">{{ t('players.name') }}</th>
+                        <th style="font-size: 0.9rem">{{ t('modal.history.before') }}</th>
+                        <th style="font-size: 0.9rem">{{ t('modal.history.after') }}</th>
+                        <th style="font-size: 0.9rem">{{ t('modal.history.change') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -79,7 +81,7 @@
             style="width: 100px"
             @click="closeModal"
           >
-            إغلاق
+            {{ t('modal.history.close') }}
           </button>
         </div>
       </div>
@@ -89,6 +91,7 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { historyUtils } from '../historyUtils';
 
 export default {
@@ -100,11 +103,22 @@ export default {
   },
   emits: ['close'],
   setup(props, { emit }) {
+    const { t } = useI18n();
     const expandedIds = ref(new Set());
 
     const formattedEvents = computed(() => {
-      return props.events.map((t) => historyUtils.formatEvent(t));
+      return props.events.map((event) => historyUtils.formatEvent(event));
     });
+
+    const translateSummary = (summary) => {
+      if (summary === 'noChanges') {
+        return t('modal.history.noChanges');
+      }
+      // Translate "added" and "removed" keys in the summary
+      let translated = summary.replace(/ added/g, ` ${t('modal.history.added')}`);
+      translated = translated.replace(/ removed/g, ` ${t('modal.history.removed')}`);
+      return translated;
+    };
 
     const toggleExpanded = (id) => {
       const newSet = new Set(expandedIds.value);
@@ -137,12 +151,14 @@ export default {
     };
 
     return {
+      t,
       formattedEvents,
       expandedIds,
       toggleExpanded,
       isExpanded,
       getRowClass,
       getScoreChangeClass,
+      translateSummary,
       closeModal
     };
   }

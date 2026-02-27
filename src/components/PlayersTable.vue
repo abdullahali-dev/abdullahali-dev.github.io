@@ -7,21 +7,21 @@
             v-model="localPlayerInput"
             type="text"
             class="form-control text-right"
-            placeholder="اسم لاعب"
+            :placeholder="t('players.addPlayer')"
             maxlength="10"
             @keyup.enter="handleAddPlayer"
           />
         </th>
         <th scope="col">
           <button class="btn btn-primary" @click="handleAddPlayer" type="button">
-            اضافة
+            {{ t('players.addButton') }}
           </button>
         </th>
       </tr>
       <tr>
-        <th scope="col">الترتيب</th>
-        <th scope="col">الاسم</th>
-        <th scope="col">النقاط</th>
+        <th scope="col">{{ t('players.rank') }}</th>
+        <th scope="col">{{ t('players.name') }}</th>
+        <th scope="col">{{ t('players.score') }}</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -51,14 +51,14 @@
               class="badge badge-warning float-right"
               style="vertical-align: middle"
             >
-              يجرش
+              {{ t('players.dealing') }}
             </span>
             <span
               v-if="index === activePlayers.length - 1"
               class="badge badge-warning float-right"
               style="vertical-align: middle"
             >
-              يوزع
+              {{ t('players.distributing') }}
             </span>
           </span>
         </td>
@@ -69,6 +69,7 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { gameUtils } from '../gameUtils';
 
 export default {
@@ -84,6 +85,7 @@ export default {
   },
   emits: ['add-player', 'remove-player'],
   setup(props, { emit }) {
+    const { t } = useI18n();
     const localPlayerInput = ref(props.playerNameInput);
 
     const activePlayers = computed(() => {
@@ -115,6 +117,7 @@ export default {
     };
 
     return {
+      t,
       localPlayerInput,
       activePlayers,
       isFirstPlayerToScore,

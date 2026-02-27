@@ -9,9 +9,9 @@
               class="btn btn-info btn-new-game float-left d-inline"
               @click="openNewGameDialog"
               >
-              لعبة جديدة
+              {{ t('app.newGame') }}
             </button>
-            <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">نشرة كنكان</h4>
+            <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">{{ t('app.title') }}</h4>
           </div>
         </div>
         <div class="card-body p-2" dir="rtl">
@@ -23,16 +23,16 @@
           <div class="m-2 justify-content-center">
             <div class="col-12 text-center">
               <button class="btn btn-success btn-action m-1" @click="initAction('Hand')">
-                هند
+                {{ t('actions.hand') }}
               </button>
               <button class="btn btn-warning btn-action m-1" @click="initAction('SuperHand')">
-                سوبر هند
+                {{ t('actions.superHand') }}
               </button>
               <button class="btn btn-danger btn-action m-1" @click="initAction('FullHand')">
-                فل هند
+                {{ t('actions.fullHand') }}
               </button>
               <button class="btn btn-primary btn-action m-1" @click="initAction('Finished')">
-                خالص
+                {{ t('actions.finished') }}
               </button>
             </div>
             <div class="col-12 text-center">
@@ -44,7 +44,7 @@
                 :disabled="!canUndo"
                 type="button"
               >
-                تراجع
+                {{ t('app.undo') }}
               </button>
               <button
                 id="BtnRedo"
@@ -54,7 +54,7 @@
                 :disabled="!canRedo"
                 type="button"
               >
-                إعادة
+                {{ t('app.redo') }}
               </button>
               <button
                 id="BtnHistory"
@@ -63,7 +63,7 @@
                 @click="openHistory"
                 type="button"
               >
-                السجل
+                {{ t('app.history') }}
               </button>
             </div>
           </div>
@@ -108,6 +108,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PlayersTable from './components/PlayersTable.vue';
 import LosersTable from './components/LosersTable.vue';
 import ScoreInputModal from './components/ScoreInputModal.vue';
@@ -123,6 +124,7 @@ export default {
     HistoryModal
   },
   setup() {
+    const { t } = useI18n();
     const gameInfo = ref(null);
     const playerNameInput = ref('');
     const showScoreModal = ref(false);
@@ -183,11 +185,11 @@ export default {
     };
 
     const openNewGameDialog = () => {
-      const maxScore = window.prompt('الحد الأعلى للنقاط');
+      const maxScore = window.prompt(t('prompts.maxScore'));
       if (maxScore === null) return;
 
       if (!maxScore.match('^[0-9]+$')) {
-        alert('يجب ادخال رقم صحيح');
+        alert(t('prompts.invalidNumber'));
         return;
       }
 
@@ -201,7 +203,7 @@ export default {
       historyUtils.saveHistory(newGameInfo.gameId, []);
     };
 
-    const addEvent = (type, actionName, beforeState, playerChanges) => {
+    const addEvent = (type, actionName, beforeState, playerChanges, actionKey = null) => {
       // Only keep events up to current position (discard the redo stack)
       events.value = events.value.slice(0, historyPosition.value);
       
@@ -210,7 +212,8 @@ export default {
         actionName,
         beforeState,
         gameInfo.value,
-        playerChanges
+        playerChanges,
+        actionKey
       );
       
       events.value.push(event);
@@ -239,7 +242,7 @@ export default {
 
     const handleAddPlayerEvent = (playerName) => {
       if (!gameInfo.value) {
-        alert('قم بإنشاء لعبة جديدة أولاً');
+        alert(t('prompts.createGameFirst'));
         return;
       }
 
@@ -248,7 +251,7 @@ export default {
     };
 
     const removePlayer = (playerId) => {
-      if (!confirm('هل انت متأكد ؟')) return;
+      if (!confirm(t('players.confirmDelete'))) return;
 
       const beforeState = JSON.parse(JSON.stringify(gameInfo.value));
       const removedPlayer = gameInfo.value.players.find((p) => p.ID === playerId);
@@ -265,12 +268,12 @@ export default {
         scoreChange: -removedPlayer.Score
       }];
       
-      addEvent('remove_player', `حذف اللاعب: ${removedPlayer.Name}`, beforeState, playerChanges);
+      addEvent('remove_player', `${t('deletePlayer.message')}: ${removedPlayer.Name}`, beforeState, playerChanges);
     };
 
     const initAction = (actionType) => {
       if (!gameInfo.value) {
-        alert('قم بإنشاء لعبة جديدة أولاً');
+        alert(t('prompts.createGameFirst'));
         return;
       }
 
@@ -289,7 +292,8 @@ export default {
       });
 
       const playerChanges = historyUtils.calculatePlayerChanges(beforePlayers, gameInfo.value.players);
-      addEvent('score_update', currentActionType.value, beforeState, playerChanges);
+      const actionDetails = gameUtils.getActionDetails(currentActionType.value);
+      addEvent('score_update', currentActionType.value, beforeState, playerChanges, actionDetails.actionKey);
 
       gameInfo.value = { ...gameInfo.value };
       showScoreModal.value = false;
@@ -341,6 +345,7 @@ export default {
       loserPlayers,
       canUndo,
       canRedo,
+      t,
       openNewGameDialog,
       addPlayer,
       handleAddPlayerEvent,

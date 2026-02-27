@@ -101,6 +101,7 @@ export const gameUtils = {
         multipleBy: 1,
         isHandType: true,
         arActionName: 'هند',
+        actionKey: 'hand',
         loserNum: 200,
         winnerNum: -60
       },
@@ -108,6 +109,7 @@ export const gameUtils = {
         multipleBy: 2,
         isHandType: true,
         arActionName: 'سوبر',
+        actionKey: 'superHand',
         loserNum: 200,
         winnerNum: -60
       },
@@ -115,6 +117,7 @@ export const gameUtils = {
         multipleBy: 3,
         isHandType: true,
         arActionName: 'فلل',
+        actionKey: 'fullHand',
         loserNum: 200,
         winnerNum: -60
       },
@@ -122,6 +125,7 @@ export const gameUtils = {
         multipleBy: 1,
         isHandType: false,
         arActionName: 'خالص',
+        actionKey: 'finished',
         loserNum: 100,
         winnerNum: -30
       }

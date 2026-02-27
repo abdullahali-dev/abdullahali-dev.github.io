@@ -3,12 +3,12 @@
     <thead>
       <tr>
         <th scope="col" colspan="2" class="px-2">
-          الخاسرون
+          {{ t('losers.title') }}
         </th>
       </tr>
       <tr>
-        <th scope="col">الاسم</th>
-        <th scope="col">النقاط</th>
+        <th scope="col">{{ t('players.name') }}</th>
+        <th scope="col">{{ t('players.score') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -21,12 +21,18 @@
 </template>
 
 <script>
+import { useI18n } from 'vue-i18n';
+
 export default {
   props: {
     loserPlayers: {
       type: Array,
       required: true
     }
+  },
+  setup() {
+    const { t } = useI18n();
+    return { t };
   }
 };
 </script>
