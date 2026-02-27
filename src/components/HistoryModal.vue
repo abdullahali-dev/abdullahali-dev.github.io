@@ -17,21 +17,17 @@
             >
               <h2 class="accordion-header m-0">
                 <button
-                  class="accordion-button collapsed ps-3 pe-3"
+                  class="accordion-button collapsed ps-3 pe-3 border-bottom"
                   type="button"
                   :data-bs-target="`#event-${event.id}`"
                   data-bs-toggle="collapse"
                 >
-                  <div class="w-100">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap">
-                      <div class="flex-grow-1">
-                        <span class="fw-bold">
-                          {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
-                        </span>
-                      </div>
-                      <small class="text-muted ms-2" style="font-size: 0.8rem; white-space: nowrap">{{ event.displayTime }}</small>
-                    </div>
+                  <div class="w-100 d-flex align-items-center justify-content-between bg-transparent">
+                    <span class="fw-bold">
+                      {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
+                    </span>
                   </div>
+                  <small class="ms-2" style="font-size: 0.8rem; white-space: nowrap">{{ event.displayTime }}</small>
                 </button>
               </h2>
               <div

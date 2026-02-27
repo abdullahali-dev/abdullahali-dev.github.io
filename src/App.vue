@@ -131,7 +131,7 @@ export default {
     const currentActionType = ref('');
     const showHistoryModal = ref(false);
     const events = ref([]);
-    const historyPosition = ref(0);
+    const removedEvents = ref([]); // Stack of removed events for redo
 
     const activePlayers = computed(() => {
       return gameInfo.value ? gameUtils.getSortedActivePlayers(gameInfo.value) : [];
@@ -141,9 +141,9 @@ export default {
       return gameInfo.value ? gameUtils.getLoserPlayers(gameInfo.value) : [];
     });
 
-    const canUndo = computed(() => historyPosition.value > 0);
+    const canUndo = computed(() => events.value.length > 0);
 
-    const canRedo = computed(() => historyPosition.value < events.value.length);
+    const canRedo = computed(() => removedEvents.value.length > 0);
 
     onMounted(() => {
       registerServiceWorker();
@@ -180,7 +180,7 @@ export default {
         gameInfo.value = saved;
         // Load history for this game
         events.value = historyUtils.loadHistory(saved.gameId);
-        historyPosition.value = events.value.length;
+        removedEvents.value = [];
       }
     };
 
@@ -199,13 +199,13 @@ export default {
       
       // Reset history for new game
       events.value = [];
-      historyPosition.value = 0;
+      removedEvents.value = [];
       historyUtils.saveHistory(newGameInfo.gameId, []);
     };
 
     const addEvent = (type, actionName, beforeState, playerChanges, actionKey = null) => {
-      // Only keep events up to current position (discard the redo stack)
-      events.value = events.value.slice(0, historyPosition.value);
+      // Clear redo stack when a new action is taken
+      removedEvents.value = [];
       
       const event = historyUtils.createEvent(
         type,
@@ -217,7 +217,6 @@ export default {
       );
       
       events.value.push(event);
-      historyPosition.value = events.value.length;
       
       // Save to localStorage
       if (gameInfo.value) {
@@ -306,23 +305,42 @@ export default {
     const undo = () => {
       if (!canUndo.value) return;
       
-      historyPosition.value--;
-      const previousEvent = events.value[historyPosition.value - 1];
+      // Remove the last event from history
+      const removedEvent = events.value.pop();
       
-      if (previousEvent) {
-        gameInfo.value = JSON.parse(JSON.stringify(previousEvent.afterState));
+      // Push to removed events stack for redo
+      removedEvents.value.push(removedEvent);
+      
+      // Restore game state to before this event
+      if (events.value.length > 0) {
+        // Restore to the state at the end of the previous event
+        gameInfo.value = JSON.parse(JSON.stringify(events.value[events.value.length - 1].afterState));
       } else {
-        gameInfo.value = JSON.parse(JSON.stringify(events.value[0]?.beforeState));
+        // No events left, restore to the initial state (beforeState of the removed event)
+        gameInfo.value = JSON.parse(JSON.stringify(removedEvent.beforeState));
+      }
+      
+      // Save updated history to localStorage
+      if (gameInfo.value) {
+        historyUtils.saveHistory(gameInfo.value.gameId, events.value);
       }
     };
 
     const redo = () => {
       if (!canRedo.value) return;
       
-      const event = events.value[historyPosition.value];
-      if (event) {
-        gameInfo.value = JSON.parse(JSON.stringify(event.afterState));
-        historyPosition.value++;
+      // Restore the last removed event
+      const restoredEvent = removedEvents.value.pop();
+      
+      // Push back to events history
+      events.value.push(restoredEvent);
+      
+      // Restore game state to after this event
+      gameInfo.value = JSON.parse(JSON.stringify(restoredEvent.afterState));
+      
+      // Save updated history to localStorage
+      if (gameInfo.value) {
+        historyUtils.saveHistory(gameInfo.value.gameId, events.value);
       }
     };
 
