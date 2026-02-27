@@ -4,9 +4,6 @@
       <div class="modal-content bg-dark text-white border-white" dir="rtl">
         <div class="modal-header bg-dark text-white border-white d-flex justify-content-between align-items-center">
           <h4 class="modal-title mb-0">{{ t('modal.history.title') }}</h4>
-          <button type="button" class="close text-white" @click="closeModal" style="position: static">
-            <span aria-hidden="true">&times;</span>
-          </button>
         </div>
         <div class="modal-body p-0">
           <div v-if="formattedEvents.length === 0" class="text-center p-4">
@@ -29,9 +26,6 @@
                       {{ event.actionKey ? t(`actions.${event.actionKey}`) : event.actionName }}
                     </strong>
                   </div>
-                  <small class="text-muted d-block" style="line-height: 1.4; word-break: break-word; font-size: 0.85rem">
-                    {{ translateSummary(event.playerChangesSummary) }}
-                  </small>
                   <small class="badge badge-info mt-2">{{ event.displayTime }}</small>
                 </div>
                 <button
