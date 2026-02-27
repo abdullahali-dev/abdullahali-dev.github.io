@@ -47,8 +47,7 @@
           <PlayersTable
             v-if="gameInfo"
             :gameInfo="gameInfo"
-            :playerNameInput.sync="playerNameInput"
-            @add-player="addPlayer"
+            @add-player="handleAddPlayerEvent"
             @remove-player="removePlayer"
           />
 
@@ -167,6 +166,16 @@ export default {
       gameInfo.value = { ...gameInfo.value };
     };
 
+    const handleAddPlayerEvent = (playerName) => {
+      if (!gameInfo.value) {
+        alert('قم بإنشاء لعبة جديدة أولاً');
+        return;
+      }
+
+      gameUtils.addPlayer(gameInfo.value, playerName);
+      gameInfo.value = { ...gameInfo.value };
+    };
+
     const removePlayer = (playerId) => {
       if (!confirm('هل انت متأكد ؟')) return;
 
@@ -218,6 +227,7 @@ export default {
       loserPlayers,
       openNewGameDialog,
       addPlayer,
+      handleAddPlayerEvent,
       removePlayer,
       initAction,
       updateScores,

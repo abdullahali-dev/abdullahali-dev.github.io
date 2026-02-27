@@ -82,7 +82,7 @@ export default {
       default: ''
     }
   },
-  emits: ['add-player', 'remove-player', 'update:playerNameInput'],
+  emits: ['add-player', 'remove-player'],
   setup(props, { emit }) {
     const localPlayerInput = ref(props.playerNameInput);
 
@@ -104,9 +104,10 @@ export default {
     };
 
     const handleAddPlayer = () => {
-      emit('update:playerNameInput', localPlayerInput.value);
-      emit('add-player');
-      localPlayerInput.value = '';
+      if (localPlayerInput.value.trim()) {
+        emit('add-player', localPlayerInput.value);
+        localPlayerInput.value = '';
+      }
     };
 
     const handleRemovePlayer = (playerId) => {
