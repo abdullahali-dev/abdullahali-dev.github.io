@@ -1,0 +1,77 @@
+{
+  "app": {
+    "title": "نشرة كنكان",
+    "versionDescription": "الإصدار الثاني 2026",
+    "maxScore": "الحد الأعلى للنقاط",
+    "newGame": "لعبة جديدة",
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "history": "السجل",
+    "editMaxScore": "تعديل الحد الأعلى للنقاط"
+  },
+  "actions": {
+    "hand": "هند",
+    "superHand": "سوبر هند",
+    "fullHand": "فل هند",
+    "finished": "خالص"
+  },
+  "players": {
+    "addPlayer": "اسم لاعب",
+    "addButton": "اضافة",
+    "rank": "الترتيب",
+    "name": "الاسم",
+    "score": "النقاط",
+    "confirmDelete": "هل انت متأكد من حذف اللاعب؟",
+    "distributing": "يوزع",
+    "dealing": "يجرش"
+  },
+  "losers": {
+    "title": "الخاسرون"
+  },
+  "modal": {
+    "scoreInput": {
+      "title": "تسجيل",
+      "player": "الاسم",
+      "points": "النقاط",
+      "clear": "مسح",
+      "cancel": "الغاء",
+      "confirm": "تم"
+    },
+    "history": {
+      "title": "سجل الأحداث",
+      "noEvents": "لا توجد أحداث",
+      "details": "التفاصيل:",
+      "before": "قبل",
+      "after": "بعد",
+      "change": "التغيير",
+      "close": "إغلاق",
+      "added": "أضيف",
+      "removed": "حذف",
+      "noChanges": "لا توجد تغييرات",
+      "rolledBack": "تم التراجع"
+    }
+  },
+  "prompts": {
+    "maxScore": "الحد الأعلى للنقاط",
+    "invalidNumber": "يجب ادخال رقم صحيح",
+    "createGameFirst": "قم بإنشاء لعبة جديدة أولاً",
+    "invalidMaxScore": "الحد الأعلى للنقاط يجب أن يكون رقماً موجباً",
+    "maxScoreLessThanCurrent": "الحد الأعلى الجديد يجب أن يكون أكبر من أو يساوي أعلى نقاط حالية",
+    "currentMaxScore": "الحد الأعلى الحالي"
+  },
+  "footer": {
+    "createdBy": "Create by",
+    "author": "Abdullah Ali",
+    "copyright": "© 2022"
+  },
+  "deletePlayer": {
+    "message": "حذف اللاعب"
+  },
+  "playerAdjustment": {
+    "addPoints": "إضافة نقاط",
+    "subtractPoints": "خصم نقاط",
+    "enterPoints": "أدخل عدد النقاط",
+    "invalidPoints": "يجب إدخال رقم صحيح",
+    "negativeScore": "رصيد اللاعب لا يمكن أن يكون سالباً"
+  }
+}

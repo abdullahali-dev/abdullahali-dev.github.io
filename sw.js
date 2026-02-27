@@ -1,6 +1,6 @@
 //v-0.0.2              
 let cacheName = "kekan-app";
-let filesToCache = ["./", "./index.html", "./main.js"];
+let filesToCache = ["./", "./index.html"];
 
 /* Start the service worker and cache all of the app's content */ 
 self.addEventListener("install", (e) => {
