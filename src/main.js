@@ -11,6 +11,8 @@ app.mount('#app')
 
 /* Register Service Worker with Update Detection */
 if ('serviceWorker' in navigator) {
+  let updatePromptShown = false; // Flag to prevent multiple prompts
+  
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((registration) => {
       // Check for updates periodically (every 1 hour)
@@ -23,8 +25,14 @@ if ('serviceWorker' in navigator) {
         const newWorker = registration.installing;
 
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // New service worker is ready and there's a controller
+          // Only show the prompt once and when there's a controller (not first install)
+          if (
+            newWorker.state === 'installed' && 
+            navigator.serviceWorker.controller && 
+            !updatePromptShown
+          ) {
+            updatePromptShown = true; // Set flag to prevent repeated prompts
+            
             // Notify user about the update
             const message = 'New version available! Please refresh your page to update.';
             
@@ -40,6 +48,9 @@ if ('serviceWorker' in navigator) {
                   refreshing = true;
                 }
               });
+            } else {
+              // Reset flag if user cancels, so they can be prompted again on next update
+              updatePromptShown = false;
             }
           }
         });
