@@ -1,11 +1,6 @@
 const VERSION = '2.0.2';
 const CACHE_NAME = `kekan-app-v${VERSION}`;
 const CRITICAL_FILES = ['./', './index.html'];
-const STATIC_FILES = [
-  './manifest.json',
-  './main.js',
-  './vite.config.js'
-];
 
 /* Install event - cache all essential files */
 self.addEventListener('install', (e) => {
@@ -82,12 +77,5 @@ self.addEventListener('fetch', (e) => {
         });
       })
     );
-  }
-});
-
-/* Post message to notify clients about updates */
-self.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
   }
 });
