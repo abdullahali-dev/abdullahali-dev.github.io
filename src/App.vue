@@ -2,14 +2,15 @@
   <div id="app" class="my-container">
     <div class="content-wrap">
       <div class="card bg-dark text-white border-white">
-        <div class="card-header border-white">
+        <div class="card-header border-white pe-0">
           <div class="card-title d-flex justify-content-between align-items-center">
             <button id="NewGameBtn" class="btn btn-info btn-new-game float-left d-inline" @click="openNewGameDialog">
               {{ t('app.newGame') }}
             </button>
-            <div>
-              <h4 class="noselect m-0 p-0 mt-2" id="title" style="user-select: none">{{ t('app.title') }}</h4>
-              <small class="text-darkgray">{{ t('app.versionDescription') }}</small>
+            <div class="align-items-center d-flex flex-row">
+              <h4 class="noselect m-0 p-0 mt-3" id="title" style="user-select: none">{{ t('app.title') }}</h4>
+              <img class="d-inline-block" src="/icons/header-icon.png" alt="Header Icon" style="height: 60px; width: auto; cursor: pointer;" @click="openIconModal">
+              <small class="d-block position-absolute text-warning" style="top:60px; right:25px; font-size: 10px;">{{ t('app.versionDescription') }}</small>
             </div>
           </div>
         </div>
@@ -24,31 +25,33 @@
 
           <div class="m-2 justify-content-center">
             <div class="col-12 text-center">
-              <button class="btn btn-success btn-action m-1" @click="initAction('Hand')">
+              <button class="btn btn-primary btn-action rounded-1 m-1" @click="initAction('Finished')">
+                {{ t('actions.finished') }}
+              </button>
+              <button class="btn btn-success btn-action rounded-1 m-1" @click="initAction('Hand')">
                 {{ t('actions.hand') }}
               </button>
-              <button class="btn btn-warning btn-action m-1" @click="initAction('SuperHand')">
-                {{ t('actions.superHand') }}
+              <button class="btn btn-warning btn-action rounded-1 m-1" @click="initAction('SuperHand')">
+                {{ t('actions.hand') }}
+                <small class="d-block" >{{ t('actions.superHand') }}</small>
               </button>
-              <button class="btn btn-danger btn-action m-1" @click="initAction('FullHand')">
-                {{ t('actions.fullHand') }}
-              </button>
-              <button class="btn btn-primary btn-action m-1" @click="initAction('Finished')">
-                {{ t('actions.finished') }}
+              <button class="btn btn-danger btn-action rounded-1 m-1" @click="initAction('FullHand')">
+                {{ t('actions.hand') }}
+                <small class="d-block" >{{ t('actions.fullHand') }}</small>
               </button>
             </div>
             <div class="col-12 text-center">
-              <button id="BtnUndo" class="btn btn-outline-success" style="width: 110px; margin: 4px" @click="undo"
+              <button id="BtnUndo" class="btn btn-sm btn-outline-secondary text-white" style="width: 110px; margin: 4px" @click="undo"
                 :disabled="!canUndo" type="button">
-                {{ t('app.undo') }}
+                <i class="bi bi-arrow-clockwise"></i> {{ t('app.undo') }}
               </button>
-              <button id="BtnRedo" class="btn btn-outline-success" style="width: 110px; margin: 4px" @click="redo"
+              <button id="BtnRedo" class="btn btn-sm btn-outline-secondary text-white" style="width: 110px; margin: 4px" @click="redo"
                 :disabled="!canRedo" type="button">
-                {{ t('app.redo') }}
+                 <i class="bi bi-arrow-counterclockwise"></i> {{ t('app.redo') }}
               </button>
-              <button id="BtnHistory" class="btn btn-outline-secondary text-white-50" style="width: 110px; margin: 4px"
+              <button id="BtnHistory" class="btn btn-sm btn-outline-secondary text-white" style="width: 110px; margin: 4px"
                 @click="openHistory" type="button">
-                {{ t('app.history') }}
+                <i class="bi bi-clock-history"></i> {{ t('app.history') }}
               </button>
             </div>
           </div>
@@ -74,6 +77,20 @@
 
     <!-- History Modal -->
     <HistoryModal v-if="showHistoryModal" :events="events" @close="closeHistoryModal" />
+
+    <!-- Icon Full-Size Modal -->
+    <div v-if="showIconModal" class="modal fade show" style="display: block" role="dialog" @click="closeIconModal">
+      <div class="modal-dialog modal-lg" role="document" @click.stop>
+        <div class="modal-content bg-dark">
+          <div class="modal-header bg-dark text-white border-white">
+            <button type="button" class="btn-close btn-close-white" @click="closeIconModal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="/icons/header-icon.png" alt="Header Icon" style="max-width: 100%; height: auto;">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -101,6 +118,7 @@ export default {
     const showScoreModal = ref(false);
     const currentActionType = ref('');
     const showHistoryModal = ref(false);
+    const showIconModal = ref(false);
     const events = ref([]);
     const removedEvents = ref([]); // Stack of removed events for redo
 
@@ -326,7 +344,7 @@ export default {
 
     const addPointsToPlayer = ({ playerId, playerName }) => {
       const pointsInput = window.prompt(
-        `${t('playerAdjustment.enterPoints')} - ${playerName}`
+        `${t('playerAdjustment.enterPoints')} - ${playerName}`, 25
       );
 
       if (pointsInput === null) return;
@@ -494,6 +512,14 @@ export default {
       showHistoryModal.value = false;
     };
 
+    const openIconModal = () => {
+      showIconModal.value = true;
+    };
+
+    const closeIconModal = () => {
+      showIconModal.value = false;
+    };
+
     return {
       gameInfo,
       playerNameInput,
@@ -519,7 +545,10 @@ export default {
       undo,
       redo,
       openHistory,
-      closeHistoryModal
+      closeHistoryModal,
+      showIconModal,
+      openIconModal,
+      closeIconModal
     };
   }
 };
@@ -538,6 +567,12 @@ div {
   width: 120px;
   height: 60px;
   vertical-align: middle;
+}
+
+@media screen and (max-width: 600px) {
+  .btn-action {
+    width: 80px;
+  }
 }
 
 .btn-new-game {

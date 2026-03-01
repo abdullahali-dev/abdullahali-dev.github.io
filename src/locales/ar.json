@@ -1,19 +1,19 @@
 {
   "app": {
     "title": "نشرة كنكان",
-    "versionDescription": "الإصدار الثاني 2026",
+    "versionDescription": "برعاية ابومالك",
     "maxScore": "الحد الأعلى للنقاط",
     "newGame": "لعبة جديدة",
     "undo": "تراجع",
-    "redo": "إعادة",
+    "redo": "تقدم",
     "history": "السجل",
     "editMaxScore": "تعديل الحد الأعلى للنقاط"
   },
   "actions": {
     "hand": "هند",
-    "superHand": "سوبر هند",
-    "fullHand": "فل هند",
-    "finished": "خالص"
+    "superHand": "سوبر",
+    "fullHand": "كلر",
+    "finished": "كان"
   },
   "players": {
     "addPlayer": "اسم لاعب",

@@ -3,17 +3,18 @@
     <thead>
       <tr>
         <th scope="col" colspan="4">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-center bg-transparent">
             <input v-model="localPlayerInput" type="text" class="form-control text-right mx-1"
               :placeholder="t('players.addPlayer')" maxlength="15" @keyup.enter="handleAddPlayer" />
               <button class="btn btn-primary mx-1" @click="handleAddPlayer" type="button">
                 {{ t('players.addButton') }}
+                <!-- <i class="bi bi-plus-circle"></i> -->
               </button>
           </div>
         </th>
       </tr>
       <tr>
-        <th scope="col" class="ps-1">{{ t('players.rank') }}</th>
+        <th scope="col" class="text-end pe-2">{{ t('players.rank') }}</th>
         <th scope="col" class="text-end">{{ t('players.name') }}</th>
         <th scope="col">{{ t('players.score') }}</th>
         <th scope="col"></th>
@@ -21,7 +22,7 @@
     </thead>
     <tbody>
       <tr v-for="(player, index) in activePlayers" :key="player.ID" :id="player.ID">
-        <td class="text-end pe-5">
+        <td class="text-end pe-3">
           {{ index + 1 }}
           <span v-if="index === activePlayers.length - 1" class="badge bg-warning text-dark p-0" style="line-height: 1.5;">
             {{ `${t('players.distributing')}` }}</span>
@@ -35,17 +36,17 @@
         <td>{{ player.Score }}</td>
         <td class="d-flex justify-content-between" style="direction: ltr">
           <div class="bg-transparent">
-            <a class="text-decoration-none px-2 text-danger" style="cursor: pointer;"
+            <a class="text-decoration-none px-2 text-danger" style="cursor: pointer; font-size: 13px;"
               @click="handleRemovePlayer(player.ID)">
-              x
+              <i class="bi bi-trash"></i>
             </a>
-            <a class="text-decoration-none px-2 text-success" style="cursor: pointer;"
+            <a class="text-decoration-none px-2 text-white" style="cursor: pointer; font-size: 13px;"
               @click="handleAddPoints(player.ID, player.Name)" title="إضافة نقاط">
-              +
+              <i class="bi bi-plus-circle"></i>
             </a>
-            <a class="text-decoration-none px-2 text-warning" style="cursor: pointer;"
+            <a class="text-decoration-none px-2 text-white" style="cursor: pointer; font-size: 13px;"
               @click="handleSubtractPoints(player.ID, player.Name)" title="خصم نقاط">
-              −
+              <i class="bi bi-dash-circle"></i>
             </a>
           </div>
           <span v-if="

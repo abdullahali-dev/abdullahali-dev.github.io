@@ -23,7 +23,7 @@
             </thead>
             <tbody>
               <tr v-for="player in activePlayers" :key="player.ID">
-                <td>{{ player.Name }}</td>
+                <td :class="{ 'text-success font-weight-bold': isFirstPlayerToScore(player) }">{{ player.Name }}</td>
                 <td>
                   <input
                     :id="'input-box-' + player.ID"
@@ -118,6 +118,19 @@ export default {
       return gameUtils.calculateActionScore(props.actionType);
     });
 
+    const isNotFirstGame = computed(() => {
+      return gameUtils.isNotFirstGame(props.gameInfo);
+    });
+
+    const lowestScorePlayer = computed(() => {
+      return gameUtils.getLowestScorePlayer(props.gameInfo);
+    });
+
+    const isFirstPlayerToScore = (player) => {
+      if (!isNotFirstGame.value) return false;
+      return lowestScorePlayer.value && lowestScorePlayer.value.ID === player.ID;
+    };
+
     const initializeScores = () => {
       scores.value = {};
       plusBtnDisabled.value = {};
@@ -193,6 +206,7 @@ export default {
       actionBtnDisabled,
       actionDetails,
       initialActionScore,
+      isFirstPlayerToScore,
       clearInput,
       addBonus,
       setWinnerScore,
