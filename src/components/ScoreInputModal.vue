@@ -13,7 +13,7 @@
         </button>
         </div>
         <div class="modal-body p-1">
-          <table class="table text-center table-dark">
+          <table class="table text-center table-dark res-table">
             <thead>
               <tr>
                 <th scope="col">{{ t('players.name') }}</th>
@@ -24,12 +24,13 @@
             <tbody>
               <tr v-for="player in activePlayers" :key="player.ID">
                 <td :class="{ 'text-success font-weight-bold': isFirstPlayerToScore(player) }">{{ player.Name }}</td>
-                <td>
+                <td class="text-center">
                   <input
                     :id="'input-box-' + player.ID"
                     v-model.number="scores[player.ID]"
                     type="tel"
                     class="form-control text-center p-0"
+                    style="max-width: 100px;"
                     placeholder="0"
                     maxlength="4"
                     @click="clearInput('input-box-' + player.ID)"
@@ -226,5 +227,8 @@ export default {
 
 input[type='tel'] {
   border-color: #ced4da !important;
+}
+.res-table td, .res-table th {
+  vertical-align: middle;
 }
 </style>

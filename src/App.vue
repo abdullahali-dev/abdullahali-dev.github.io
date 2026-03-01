@@ -557,16 +557,22 @@ export default {
 <style>
 body {
   font-family: 'Tajawal', sans-serif !important;
+  background: url('/icons/header-icon.png');
+  background-size: 100% auto;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-div {
+/* div {
   background-color: #343a40 !important;
-}
+} */
 
 .btn-action {
   width: 120px;
   height: 60px;
   vertical-align: middle;
+  opacity: 1 !important;
 }
 
 @media screen and (max-width: 600px) {
@@ -607,6 +613,7 @@ th {
 .my-container {
   position: relative;
   min-height: 99.9vh;
+  opacity: 0.90;
 }
 
 .content-wrap {
